@@ -16,27 +16,19 @@ function guessCategory(title: string): string {
   if (t.includes('web') || t.includes('sqli') || t.includes('xss') || t.includes('웹')) return 'WEB'
   if (t.includes('crypto') || t.includes('암호') || t.includes('aes') || t.includes('rsa')) return 'CRYPTO'
   if (t.includes('reversing') || t.includes('리버싱') || t.includes('pwn')) return 'REVERSING'
-  return 'CTF'
+  if (t.includes('dreamhack') || t.includes('dh') || t.includes('ctf')) return 'CTF'
+  return 'MISC'
 }
 
 export default function Blog() {
   const [posts, setPosts] = useState<Post[]>(FALLBACK)
 
   useEffect(() => {
-    const RSS = 'https://rinhye05.tistory.com/rss'
-    const API = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(RSS)}&count=6`
-
-    fetch(API)
+    fetch('/api/blog')
       .then((r) => r.json())
-      .then((data) => {
-        if (data.status !== 'ok' || !data.items?.length) return
-        const parsed: Post[] = data.items.map((item: { title: string; pubDate: string; link: string }) => ({
-          cat: guessCategory(item.title),
-          title: item.title,
-          date: item.pubDate?.slice(0, 7).replace('-', '.') ?? '',
-          href: item.link,
-        }))
-        setPosts(parsed)
+      .then((data: { title: string; href: string; date: string }[]) => {
+        if (!data?.length) return
+        setPosts(data.map((p) => ({ ...p, cat: guessCategory(p.title) })))
       })
       .catch(() => {})
   }, [])
@@ -53,7 +45,7 @@ export default function Blog() {
 
       <div className="blog-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '7px' }}>
         {posts.map((p) => (
-          <a key={p.title} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+          <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             <div
               className="blog-card-border"
               style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '.8rem 1rem', transition: 'border-color .2s' }}
