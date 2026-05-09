@@ -31,7 +31,7 @@ function matchCat(title: string): string {
 }
 
 export default function Blog() {
-  const [posts, setPosts] = useState<Post[]>(FALLBACK)
+  const [posts, setPosts] = useState<Post[] | null>(null)
 
   useEffect(() => {
     fetch('/api/blog')
@@ -43,13 +43,32 @@ export default function Blog() {
           .filter((p) => p.cat !== 'skip')
         if (mapped.length) setPosts(mapped)
       })
-      .catch(() => {})
+      .catch(() => { setPosts(FALLBACK) })
   }, [])
 
   const grouped = CAT_MAP.map((c) => ({
     ...c,
-    posts: posts.filter((p) => p.cat === c.key).slice(0, 3),
+    posts: (posts ?? []).filter((p) => p.cat === c.key).slice(0, 3),
   })).filter((g) => g.posts.length > 0)
+
+  if (posts === null) return (
+    <section id="blog" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
+        <div className="sec-tag">INTEL LOG</div>
+        <div style={{ flex: 1, height: '1px', background: 'var(--bd)' }} />
+        <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://RECENT_POSTS</div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {[...Array(3)].map((_, i) => (
+          <div key={i} style={{ height: '60px', background: 'var(--bg2)', border: '1px solid var(--bd)', borderLeft: '2px solid var(--bd)', padding: '.8rem 1rem', opacity: 1 - i * 0.2 }}>
+            <div style={{ height: '10px', width: `${60 - i * 10}%`, background: 'var(--bd)', marginBottom: '8px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+            <div style={{ height: '8px', width: '30%', background: 'var(--bd)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+          </div>
+        ))}
+      </div>
+      <style>{`@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }`}</style>
+    </section>
+  )
 
   return (
     <section id="blog" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
