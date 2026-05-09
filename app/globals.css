@@ -4,7 +4,7 @@
 
 html, body {
   background: #040810 !important;
-  color: #8aafc8 !important;
+  color: #a8c8e0 !important;
   font-size: 102%;
 }
 
@@ -18,8 +18,8 @@ html, body {
   --bg3: #0c1426;
   --acc: #00e5ff;
   --acc2: #ff2d55;
-  --tx: #8aafc8;
-  --tx2: #4a6580;
+  --tx: #a8c8e0;
+  --tx2: #6a90b0;
   --txw: #cce4ff;
   --bd: #142035;
 }
