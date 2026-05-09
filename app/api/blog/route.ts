@@ -8,17 +8,14 @@ export async function GET() {
     const xml = await res.text()
 
     const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
-    const posts = items.slice(0, 9).map((m) => {
+    const posts = items.map((m) => {
       const block = m[1]
 
       const title = block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1]
         ?? block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''
-
       const link = block.match(/<link>(.*?)<\/link>/)?.[1]
         ?? block.match(/<guid>(.*?)<\/guid>/)?.[1] ?? '#'
-
       const date = block.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? ''
-
       const category = block.match(/<category><!\[CDATA\[(.*?)\]\]><\/category>/)?.[1]
         ?? block.match(/<category>(.*?)<\/category>/)?.[1] ?? ''
 
@@ -27,12 +24,7 @@ export async function GET() {
         ? ''
         : `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}`
 
-      return {
-        title: title.trim(),
-        href: link.trim(),
-        date: formatted,
-        category: category.trim(),
-      }
+      return { title: title.trim(), href: link.trim(), date: formatted, category: category.trim() }
     })
 
     return NextResponse.json(posts)
