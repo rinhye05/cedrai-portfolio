@@ -1,9 +1,9 @@
 'use client'
 
 const POSTS = [
-  { cat: 'FORENSICS', title: '[DH] study_checker writeup',   date: '2026.05', href: '#' },
-  { cat: 'FORENSICS', title: '[DH] flask-forensics writeup', date: '2026.05', href: '#' },
-  { cat: 'WEB',       title: '[Hacktheon] simple-sqli',      date: '2026.05', href: '#' },
+  { cat: 'FORENSICS', title: '[DH] study_checker writeup',   date: '2026.05', href: 'https://rinhye05.tistory.com/23' },
+  { cat: 'FORENSICS', title: '[DH] flask-forensics writeup', date: '2026.05', href: 'https://rinhye05.tistory.com/25' },
+  { cat: 'WEB',       title: '[Hacktheon] simple-sqli',      date: '2026.05', href: 'https://rinhye05.tistory.com/19' },
 ]
 
 export default function Blog() {
@@ -19,7 +19,7 @@ export default function Blog() {
 
       <div className="blog-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '7px' }}>
         {POSTS.map((p) => (
-          <a key={p.title} href={p.href} style={{ textDecoration: 'none' }}>
+          <a key={p.title} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             <div
               className="blog-card-border"
               style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '.8rem 1rem', transition: 'border-color .2s' }}

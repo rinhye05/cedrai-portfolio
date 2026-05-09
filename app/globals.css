@@ -1,3 +1,12 @@
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: #040810 !important;
+  color: #6a90b0 !important;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
