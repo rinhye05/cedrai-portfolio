@@ -8,7 +8,7 @@ const jetbrains = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Cédrai — Portfolio',
+  title: 'Cédrai_',
   description: 'Computer Engineering · CTF · Forensics · Web Hacking · Security · Python',
   keywords: ['CTF', 'Forensics', 'Security', 'Python', 'Portfolio'],
 }
