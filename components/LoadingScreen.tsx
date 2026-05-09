@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 type Phase = 'loading' | 'hello' | 'done'
 
 function HelloTyping() {
-  const full = 'Hello, World.'
+  const full = 'Hello, World!'
   const [text, setText] = useState('')
 
   useEffect(() => {
