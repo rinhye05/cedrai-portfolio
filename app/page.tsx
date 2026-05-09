@@ -21,8 +21,6 @@ export default function Home() {
         <Nav />
         <ScrollReveal><Hero /></ScrollReveal>
         <ScrollReveal delay={50}><Skills /></ScrollReveal>
-        <ScrollReveal delay={50}><Projects /></ScrollReveal>
-        <ScrollReveal delay={50}><Blog /></ScrollReveal>
         <ScrollReveal delay={50}><Contact /></ScrollReveal>
         <Footer />
       </main>
