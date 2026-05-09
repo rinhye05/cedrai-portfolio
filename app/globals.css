@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #040810;
+  --bg2: #080e1c;
+  --bg3: #0c1426;
+  --acc: #00e5ff;
+  --acc2: #ff2d55;
+  --tx: #6a90b0;
+  --tx2: #2a4060;
+  --txw: #cce4ff;
+  --bd: #142035;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  min-height: 100vh;
+}
+
+/* ── 스캔라인 배경 ── */
+.scanlines {
+  position: relative;
+}
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 29px,
+    rgba(0, 229, 255, 0.03) 30px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 글리치 ── */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  color: var(--acc2);
+  animation: glitch1 5s infinite;
+}
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  color: var(--acc);
+  animation: glitch2 5s infinite;
+}
+
+@keyframes glitch1 {
+  0%, 88%, 100% { clip-path: none; transform: none; }
+  89%  { clip-path: inset(28% 0 58% 0); transform: translate(-6px); }
+  91%  { clip-path: inset(62% 0 12% 0); transform: translate(4px); }
+  92%  { clip-path: none; }
+}
+@keyframes glitch2 {
+  0%, 91%, 100% { clip-path: none; transform: none; }
+  92%  { clip-path: inset(14% 0 72% 0); transform: translate(6px); }
+  94%  { clip-path: inset(48% 0 38% 0); transform: translate(-4px); }
+  95%  { clip-path: none; }
+}
+
+/* ── 코너 브라켓 ── */
+.hud-corner { position: relative; }
+.hud-corner::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px;
+  width: 9px; height: 9px;
+  border-top: 1px solid var(--acc);
+  border-left: 1px solid var(--acc);
+}
+.hud-corner::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 9px; height: 9px;
+  border-bottom: 1px solid var(--acc);
+  border-right: 1px solid var(--acc);
+}
+.hud-corner-red::before { border-color: var(--acc2); }
+.hud-corner-red::after  { border-color: var(--acc2); }
+
+/* ── 클립 코너 카드 ── */
+.clip-card {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+
+/* ── 섹션 헤더 태그 ── */
+.sec-tag {
+  font-size: 8px;
+  letter-spacing: .2em;
+  color: var(--bg);
+  background: var(--acc);
+  padding: 3px 10px;
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
+  white-space: nowrap;
+  font-weight: 700;
+}
+.sec-tag-red { background: var(--acc2); }
+
+/* ── 버튼 ── */
+.btn-primary {
+  padding: 7px 16px;
+  border: 1px solid var(--acc);
+  color: var(--acc);
+  background: transparent;
+  font-size: 9px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: .1em;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: background .2s;
+}
+.btn-primary:hover { background: rgba(0, 229, 255, 0.08); }
+
+.btn-secondary {
+  padding: 7px 16px;
+  border: 1px solid var(--bd);
+  color: var(--tx2);
+  background: transparent;
+  font-size: 9px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: .08em;
+  transition: border-color .2s, color .2s;
+}
+.btn-secondary:hover { border-color: var(--tx); color: var(--tx); }
+
+/* ── 스캐너 ── */
+@keyframes scanner-spin { to { transform: rotate(360deg); } }
+@keyframes pulse-dot    { 0%, 100% { opacity: 1; } 50% { opacity: .2; } }
+@keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.scanner-sweep {
+  animation: scanner-spin 2.8s linear infinite;
+}
+.scanner-pulse {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+.typed-cursor::after {
+  content: '█';
+  animation: cursor-blink 1s step-end infinite;
+}
+
+/* ── 스킬 바 ── */
+.skill-fill-cyan { background: var(--acc); }
+.skill-fill-red  { background: var(--acc2); }
+
+/* ── 블로그 카드 ── */
+.blog-card-border { border-left: 2px solid var(--acc2); }
+
+/* ── 반응형 섹션 ── */
+@media (max-width: 640px) {
+  .hero-grid { grid-template-columns: 1fr !important; }
+  .scanner-wrap { display: none; }
+  .proj-grid  { grid-template-columns: 1fr !important; }
+  .skill-grid { grid-template-columns: 1fr 1fr !important; }
+  .blog-grid  { grid-template-columns: 1fr !important; }
+  .contact-wrap { flex-direction: column; }
+}
