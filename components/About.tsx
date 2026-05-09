@@ -4,13 +4,13 @@ const ABOUT = {
   intro: [
     '건국대학교 GLOCAL캠퍼스 컴퓨터공학과에 재학 중입니다.',
     '보안에 관심을 가지고 CTF, 포렌식, 웹해킹, 리버싱을 공부하고 있습니다.',
-    '시스템을 분해하고 이해하는 방식으로 성장합니다.',
+    '소모임 seKUrity에서 활동중입니다.',
   ],
   education: [
-    { label: 'UNIVERSITY', value: '건국대학교 GLOCAL캠퍼스' },
-    { label: 'MAJOR',      value: '컴퓨터공학과' },
-    { label: 'STATUS',     value: '재학 중' },
-    { label: 'LOCATION',   value: '충주' },
+    { label: 'UNIVERSITY', value: 'KONKUK UNIV. GLOCAT' },
+    { label: 'MAJOR',      value: 'Computer Engineering' },
+    { label: 'STATUS',     value: 'Enrolled' },
+    { label: 'LOCATION',   value: 'Chungju, Korea' },
   ],
   certs: [
     // 자격증 생기면 여기에 추가
@@ -34,7 +34,7 @@ export default function About() {
         <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://PROFILE</div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
 
         {/* 자기소개 */}
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem' }}>
