@@ -23,32 +23,20 @@ const CAT_MAP: { key: string; label: string; color: string }[] = [
 // 소분류: study/논문 → forensic | forensic/web-hacking/misc/reversing → dreamhack
 //         2026 헥테온 → ctf | btlo → btlo | 조사/실습 → sekurity
 function matchCat(category: string, title: string): string {
-  const c = category.toLowerCase().trim()
+  // 대분류만 추출 (Forensic/논문 → Forensic)
+  const top = category.split('/')[0].toLowerCase().trim()
   const t = title.toLowerCase().trim()
 
-  // 대분류 직접 매핑
-  if (c === 'forensic')  return 'forensic'
-  if (c === 'dreamhack') return 'dreamhack'
-  if (c === 'ctf')       return 'ctf'
-  if (c === 'btlo')      return 'btlo'
-  if (c === 'seku' || c === 'sekurity') return 'sekurity'
-
-  // 소분류 매핑
-  if (['study', '논문'].includes(c))                              return 'forensic'
-  if (['forensic', 'web-hacking', 'misc', 'reversing'].includes(c)) return 'dreamhack'
-  if (c.includes('헥테온') || c.includes('hacktheon'))            return 'ctf'
-  if (['조사', '실습'].includes(c))                               return 'sekurity'
-
-  // 카테고리 없으면 제목으로 fallback
-  if (t.includes('btlo'))                                         return 'btlo'
-  if (t.includes('헥테온') || t.includes('hacktheon'))            return 'ctf'
-  if (t.includes('[dreamhack]') || t.includes('dreamhack'))       return 'dreamhack'
-  if (t.includes('seku'))                                         return 'sekurity'
-
   // 공지 제외
-  if (t === '블로그 소개' || t.includes('공지'))                   return 'skip'
+  if (!category || t === '블로그 소개' || t.includes('공지')) return 'skip'
 
-  return 'forensic'
+  if (top === 'forensic')              return 'forensic'
+  if (top === 'dreamhack')             return 'dreamhack'
+  if (top === 'ctf')                   return 'ctf'
+  if (top === 'btlo')                  return 'btlo'
+  if (top === 'seku' || top === 'sekurity') return 'sekurity'
+
+  return 'skip'
 }
 
 export default function Blog() {
