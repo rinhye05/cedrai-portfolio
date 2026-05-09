@@ -18,15 +18,36 @@ const CAT_MAP: { key: string; label: string; color: string }[] = [
   { key: 'sekurity',  label: 'seKUrity',  color: '#a855f7'     },
 ]
 
-// 제목 기반으로 카테고리 분류
-function matchCat(title: string): string {
-  const t = title.toLowerCase()
-  if (t.includes('btlo'))                          return 'btlo'
-  if (t.includes('헥테온') || t.includes('hacktheon') || t.includes('hacktheon')) return 'ctf'
-  if (t.includes('[dreamhack]') || t.includes('dreamhack')) return 'dreamhack'
-  if (t.includes('seku') || t.includes('sekurity')) return 'sekurity'
-  // 블로그 소개 등 공지 제외
-  if (t === '블로그 소개' || t.includes('공지'))    return 'skip'
+// 티스토리 카테고리 태그 기반 분류
+// 대분류: Forensic, DreamHack, CTF, BTLO, seKU
+// 소분류: study/논문 → forensic | forensic/web-hacking/misc/reversing → dreamhack
+//         2026 헥테온 → ctf | btlo → btlo | 조사/실습 → sekurity
+function matchCat(category: string, title: string): string {
+  const c = category.toLowerCase().trim()
+  const t = title.toLowerCase().trim()
+
+  // 대분류 직접 매핑
+  if (c === 'forensic')  return 'forensic'
+  if (c === 'dreamhack') return 'dreamhack'
+  if (c === 'ctf')       return 'ctf'
+  if (c === 'btlo')      return 'btlo'
+  if (c === 'seku' || c === 'sekurity') return 'sekurity'
+
+  // 소분류 매핑
+  if (['study', '논문'].includes(c))                              return 'forensic'
+  if (['forensic', 'web-hacking', 'misc', 'reversing'].includes(c)) return 'dreamhack'
+  if (c.includes('헥테온') || c.includes('hacktheon'))            return 'ctf'
+  if (['조사', '실습'].includes(c))                               return 'sekurity'
+
+  // 카테고리 없으면 제목으로 fallback
+  if (t.includes('btlo'))                                         return 'btlo'
+  if (t.includes('헥테온') || t.includes('hacktheon'))            return 'ctf'
+  if (t.includes('[dreamhack]') || t.includes('dreamhack'))       return 'dreamhack'
+  if (t.includes('seku'))                                         return 'sekurity'
+
+  // 공지 제외
+  if (t === '블로그 소개' || t.includes('공지'))                   return 'skip'
+
   return 'forensic'
 }
 
@@ -36,12 +57,12 @@ export default function Blog() {
   useEffect(() => {
     fetch('/api/blog')
       .then((r) => r.json())
-      .then((data: { title: string; href: string; date: string }[]) => {
-        if (!data?.length) return
+      .then((data: { title: string; href: string; date: string; category: string }[]) => {
+        if (!data?.length) { setPosts(FALLBACK); return }
         const mapped: Post[] = data
-          .map((p) => ({ ...p, cat: matchCat(p.title) }))
+          .map((p) => ({ ...p, cat: matchCat(p.category, p.title) }))
           .filter((p) => p.cat !== 'skip')
-        if (mapped.length) setPosts(mapped)
+        setPosts(mapped.length ? mapped : FALLBACK)
       })
       .catch(() => { setPosts(FALLBACK) })
   }, [])
