@@ -13,19 +13,19 @@ export async function GET() {
 
       const title = block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1]
         ?? block.match(/<title>(.*?)<\/title>/)?.[1] ?? ''
+
       const link = block.match(/<link>(.*?)<\/link>/)?.[1]
-        ?? block.match(/<guid>(.*?)<\/guid>/)?.[1] ?? '#'
+        ?? block.match(/<guid[^>]*>(.*?)<\/guid>/)?.[1] ?? '#'
+
       const date = block.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? ''
-      const category = block.match(/<category><!\[CDATA\[(.*?)\]\]><\/category>/)?.[1]
-        ?? block.match(/<category>(.*?)<\/category>/)?.[1] ?? ''
 
       const d = new Date(date)
       const formatted = isNaN(d.getTime())
         ? ''
         : `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}`
 
-      return { title: title.trim(), href: link.trim(), date: formatted, category: category.trim() }
-    })
+      return { title: title.trim(), href: link.trim(), date: formatted }
+    }).filter((p) => p.title && p.href !== '#')
 
     return NextResponse.json(posts)
   } catch {

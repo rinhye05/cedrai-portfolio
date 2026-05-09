@@ -18,15 +18,16 @@ const CAT_MAP: { key: string; label: string; color: string }[] = [
   { key: 'sekurity',  label: 'seKUrity',  color: '#a855f7'     },
 ]
 
-// 티스토리 소분류 → 대분류 매핑
-function matchCat(raw: string): string | null {
-  const r = raw.toLowerCase().trim()
-  if (['study', '논문'].includes(r))                          return 'forensic'
-  if (['forensic', 'web-hacking', 'misc', 'reversing'].includes(r)) return 'dreamhack'
-  if (r.includes('헥테온') || r === 'ctf')                   return 'ctf'
-  if (r === 'btlo')                                           return 'btlo'
-  if (['조사', '실습'].includes(r))                           return 'sekurity'
-  return null // null이면 표시 안 함
+// 제목 기반으로 카테고리 분류
+function matchCat(title: string): string {
+  const t = title.toLowerCase()
+  if (t.includes('btlo'))                          return 'btlo'
+  if (t.includes('헥테온') || t.includes('hacktheon') || t.includes('hacktheon')) return 'ctf'
+  if (t.includes('[dreamhack]') || t.includes('dreamhack')) return 'dreamhack'
+  if (t.includes('seku') || t.includes('sekurity')) return 'sekurity'
+  // 블로그 소개 등 공지 제외
+  if (t === '블로그 소개' || t.includes('공지'))    return 'skip'
+  return 'forensic'
 }
 
 export default function Blog() {
@@ -35,23 +36,19 @@ export default function Blog() {
   useEffect(() => {
     fetch('/api/blog')
       .then((r) => r.json())
-      .then((data: { title: string; href: string; date: string; category: string }[]) => {
+      .then((data: { title: string; href: string; date: string }[]) => {
         if (!data?.length) return
-        const filtered: Post[] = data
-          .map((p) => {
-            const cat = matchCat(p.category)
-            if (!cat) return null
-            return { title: p.title, href: p.href, date: p.date, cat }
-          })
-          .filter(Boolean) as Post[]
-        if (filtered.length) setPosts(filtered)
+        const mapped: Post[] = data
+          .map((p) => ({ ...p, cat: matchCat(p.title) }))
+          .filter((p) => p.cat !== 'skip')
+        if (mapped.length) setPosts(mapped)
       })
       .catch(() => {})
   }, [])
 
   const grouped = CAT_MAP.map((c) => ({
     ...c,
-    posts: posts.filter((p) => p.cat === c.key).slice(0, 6),
+    posts: posts.filter((p) => p.cat === c.key).slice(0, 3),
   })).filter((g) => g.posts.length > 0)
 
   return (
