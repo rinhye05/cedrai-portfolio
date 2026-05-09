@@ -26,11 +26,11 @@ export default function Nav() {
       }}
     >
       {/* 로고 */}
-      <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '.08em', color: 'var(--txw)' }}>
+      <Link href="/" style={{ textDecoration: 'none', fontSize: '14px', fontWeight: 700, letterSpacing: '.08em', color: 'var(--txw)' }}>
         <span style={{ color: 'var(--acc)' }}>❮</span>
         Cédrai
         <span style={{ color: 'var(--acc)' }}>/❯</span>
-      </div>
+      </Link>
 
       {/* 링크 */}
       <div style={{ display: 'flex', gap: '20px' }}>

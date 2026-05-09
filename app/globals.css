@@ -4,7 +4,8 @@
 
 html, body {
   background: #040810 !important;
-  color: #6a90b0 !important;
+  color: #8aafc8 !important;
+  font-size: 102%;
 }
 
 @tailwind base;
@@ -17,8 +18,8 @@ html, body {
   --bg3: #0c1426;
   --acc: #00e5ff;
   --acc2: #ff2d55;
-  --tx: #6a90b0;
-  --tx2: #2a4060;
+  --tx: #8aafc8;
+  --tx2: #4a6580;
   --txw: #cce4ff;
   --bd: #142035;
 }

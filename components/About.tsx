@@ -1,25 +1,28 @@
 'use client'
 
+import Image from 'next/image'
+
 const ABOUT = {
   intro: [
     '건국대학교 GLOCAL캠퍼스 컴퓨터공학과에 재학 중입니다.',
     '보안에 관심을 가지고 CTF, 포렌식, 웹해킹, 리버싱을 공부하고 있습니다.',
-    '소모임 seKUrity에서 활동중입니다.',
+    '시스템을 분해하고 이해하는 방식으로 성장합니다.',
   ],
   education: [
-    { label: 'UNIVERSITY', value: 'KONKUK UNIV. GLOCAT' },
+    { label: 'UNIVERSITY', value: 'Konkuk Univ. GLOCAL' },
     { label: 'MAJOR',      value: 'Computer Engineering' },
     { label: 'STATUS',     value: 'Enrolled' },
     { label: 'LOCATION',   value: 'Chungju, Korea' },
   ],
-  certs: [
-    // 자격증 생기면 여기에 추가
-    // { name: '정보처리기사', date: '2025.00', status: 'ACQUIRED' },
-  ] as { name: string; date: string; status: string }[],
+  certs: [] as { name: string; date: string; status: string }[],
   activities: [
     { label: 'CTF PLATFORM', value: 'Dreamhack' },
     { label: 'BLOG',         value: 'rinhye05.tistory.com' },
     { label: 'GITHUB',       value: 'github.com/rinhye05' },
+  ],
+  clubs: [
+    { name: 'seKUrity', role: '신입부원', period: '25.03 – 25.08' },
+    { name: 'seKUrity', role: '기존부원', period: '25.09 – 현재' },
   ],
 }
 
@@ -36,12 +39,20 @@ export default function About() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
 
-        {/* 자기소개 */}
-        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem' }}>
-          <div style={{ fontSize: '8px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ INTRODUCTION ]</div>
-          {ABOUT.intro.map((line, i) => (
-            <p key={i} style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.85, marginBottom: '.3rem' }}>{line}</p>
-          ))}
+        {/* 자기소개 + 사진 */}
+        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', display: 'flex', gap: '1.2rem', alignItems: 'flex-start' }}>
+          <div style={{ flexShrink: 0 }}>
+            <div style={{ width: '80px', height: '80px', border: '1px solid var(--acc)', overflow: 'hidden', position: 'relative' }}>
+              <Image src="/경멸고영.jpeg" alt="profile" fill style={{ objectFit: 'cover' }} />
+            </div>
+            <div style={{ fontSize: '7px', color: 'var(--acc)', letterSpacing: '.1em', marginTop: '5px', textAlign: 'center' }}>CÉDRAI</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '8px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.8rem' }}>[ INTRODUCTION ]</div>
+            {ABOUT.intro.map((line, i) => (
+              <p key={i} style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.85, marginBottom: '.3rem' }}>{line}</p>
+            ))}
+          </div>
         </div>
 
         {/* 학교/전공 */}
@@ -66,7 +77,7 @@ export default function About() {
                 <span style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif' }}>{c.name}</span>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <span style={{ fontSize: '8px', color: 'var(--tx2)' }}>{c.date}</span>
-                  <span style={{ fontSize: '7px', color: 'var(--acc)', border: '1px solid var(--acc)', padding: '1px 5px', letterSpacing: '.08em' }}>{c.status}</span>
+                  <span style={{ fontSize: '7px', color: 'var(--acc)', border: '1px solid var(--acc)', padding: '1px 5px' }}>{c.status}</span>
                 </div>
               </div>
             ))
@@ -82,6 +93,20 @@ export default function About() {
               <span style={{ fontSize: '10px', color: 'var(--txw)', fontFamily: 'sans-serif' }}>{item.value}</span>
             </div>
           ))}
+        </div>
+
+        {/* 동아리 */}
+        <div className="hud-corner hud-corner-red" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', gridColumn: '1 / -1' }}>
+          <div style={{ fontSize: '8px', color: 'var(--acc2)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ CLUBS & ACTIVITIES ]</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {ABOUT.clubs.map((c, i) => (
+              <div key={i} className="hud-corner" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', padding: '.7rem 1rem', minWidth: '180px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--txw)', fontWeight: 700, marginBottom: '4px' }}>{c.name}</div>
+                <div style={{ fontSize: '9px', color: 'var(--acc2)', marginBottom: '3px' }}>{c.role}</div>
+                <div style={{ fontSize: '8px', color: 'var(--tx2)' }}>{c.period}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>
