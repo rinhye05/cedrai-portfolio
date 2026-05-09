@@ -4,9 +4,9 @@ import Image from 'next/image'
 
 const ABOUT = {
   intro: [
-    '건국대학교 GLOCAL캠퍼스 컴퓨터공학과에 재학 중입니다.',
-    '보안에 관심을 가지고 CTF, 포렌식, 웹해킹, 리버싱을 공부하고 있습니다.',
-    '시스템을 분해하고 이해하는 방식으로 성장합니다.',
+    '건국대학교 글로컬캠퍼스 컴퓨터공학과에 재학 중입니다.',
+    '보안에 관심이 많고 디지털 포렌식 수사관이 되고싶어서 공부중입니다.',
+    '현재 보안 소모임 seKUrity에 소속되어있습니다.',
   ],
   education: [
     { label: 'UNIVERSITY', value: 'Konkuk Univ. GLOCAL' },
