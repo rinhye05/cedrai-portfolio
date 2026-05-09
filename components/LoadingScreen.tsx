@@ -4,6 +4,36 @@ import { useEffect, useState } from 'react'
 
 type Phase = 'loading' | 'hello' | 'done'
 
+function HelloTyping() {
+  const full = 'Hello, World.'
+  const [text, setText] = useState('')
+
+  useEffect(() => {
+    let i = 0
+    const t = setInterval(() => {
+      i++
+      setText(full.slice(0, i))
+      if (i >= full.length) clearInterval(t)
+    }, 90)
+    return () => clearInterval(t)
+  }, [])
+
+  const colored = text.split('').map((ch, i) => {
+    if (i >= 7 && i <= 11) return <span key={i} style={{ color: 'var(--acc)' }}>{ch}</span>
+    if (i === 12) return <span key={i} style={{ color: 'var(--acc2)' }}>{ch}</span>
+    return <span key={i}>{ch}</span>
+  })
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: '11px', color: 'var(--tx2)', letterSpacing: '.2em', marginBottom: '1rem' }}>SYS://WELCOME</div>
+      <div className="typed-cursor" style={{ fontSize: '48px', fontWeight: 700, color: 'var(--txw)', letterSpacing: '.06em' }}>
+        {colored}
+      </div>
+    </div>
+  )
+}
+
 export default function LoadingScreen({ onDone }: { onDone: () => void }) {
   const [progress, setProgress] = useState(0)
   const [phase, setPhase] = useState<Phase>('loading')
@@ -88,20 +118,7 @@ export default function LoadingScreen({ onDone }: { onDone: () => void }) {
         </>
       )}
 
-      {phase === 'hello' && (
-        <div style={{ textAlign: 'center', animation: 'fadeIn .4s ease' }}>
-          <div style={{ fontSize: '11px', color: 'var(--tx2)', letterSpacing: '.2em', marginBottom: '1rem' }}>SYS://WELCOME</div>
-          <div style={{ fontSize: '48px', fontWeight: 700, color: 'var(--txw)', letterSpacing: '.06em' }}>
-            Hello,<br />
-            <span style={{ color: 'var(--acc)' }}>World</span>
-            <span style={{ color: 'var(--acc2)' }}>.</span>
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-      `}</style>
+      {phase === 'hello' && <HelloTyping />}
     </div>
   )
 }
