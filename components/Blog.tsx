@@ -10,14 +10,29 @@ const FALLBACK: Post[] = [
   { cat: 'WEB',       title: '[Hacktheon] simple-sqli',      date: '2026.05', href: 'https://rinhye05.tistory.com/19' },
 ]
 
-function guessCategory(title: string): string {
-  const t = title.toLowerCase()
-  if (t.includes('forensic') || t.includes('포렌식') || t.includes('prefetch') || t.includes('memory')) return 'FORENSICS'
-  if (t.includes('web') || t.includes('sqli') || t.includes('xss') || t.includes('웹')) return 'WEB'
-  if (t.includes('crypto') || t.includes('암호') || t.includes('aes') || t.includes('rsa')) return 'CRYPTO'
-  if (t.includes('reversing') || t.includes('리버싱') || t.includes('pwn')) return 'REVERSING'
-  if (t.includes('dreamhack') || t.includes('dh') || t.includes('ctf')) return 'CTF'
-  return 'MISC'
+function mapCategory(raw: string): string {
+  const c = raw.toLowerCase()
+  if (c.includes('forensic'))  return 'FORENSICS'
+  if (c.includes('dreamhack')) return 'DREAMHACK'
+  if (c.includes('web'))       return 'WEB'
+  if (c.includes('ctf'))       return 'CTF'
+  if (c.includes('btlo'))      return 'BTLO'
+  if (c.includes('seku'))      return 'SEKURITY'
+  if (c.includes('reversing')) return 'REVERSING'
+  if (c.includes('study'))     return 'STUDY'
+  return raw.toUpperCase() || 'MISC'
+}
+
+const CAT_COLOR: Record<string, string> = {
+  FORENSICS:  'var(--acc2)',
+  DREAMHACK:  'var(--acc2)',
+  WEB:        'var(--acc2)',
+  CTF:        'var(--acc2)',
+  BTLO:       '#ff9500',
+  SEKURITY:   '#a855f7',
+  REVERSING:  'var(--acc2)',
+  STUDY:      'var(--acc)',
+  MISC:       'var(--tx2)',
 }
 
 export default function Blog() {
@@ -26,9 +41,14 @@ export default function Blog() {
   useEffect(() => {
     fetch('/api/blog')
       .then((r) => r.json())
-      .then((data: { title: string; href: string; date: string }[]) => {
+      .then((data: { title: string; href: string; date: string; category: string }[]) => {
         if (!data?.length) return
-        setPosts(data.map((p) => ({ ...p, cat: guessCategory(p.title) })))
+        setPosts(data.map((p) => ({
+          title: p.title,
+          href:  p.href,
+          date:  p.date,
+          cat:   mapCategory(p.category),
+        })))
       })
       .catch(() => {})
   }, [])
@@ -48,11 +68,11 @@ export default function Blog() {
           <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             <div
               className="blog-card-border"
-              style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '.8rem 1rem', transition: 'border-color .2s' }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'var(--acc2)')}
+              style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '.8rem 1rem', transition: 'border-color .2s', height: '100%' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = CAT_COLOR[p.cat] ?? 'var(--acc2)')}
               onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'var(--bd)')}
             >
-              <div style={{ fontSize: '8px', color: 'var(--acc2)', letterSpacing: '.14em', marginBottom: '5px' }}>{p.cat}</div>
+              <div style={{ fontSize: '8px', color: CAT_COLOR[p.cat] ?? 'var(--acc2)', letterSpacing: '.14em', marginBottom: '5px' }}>{p.cat}</div>
               <div style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.45, marginBottom: '8px' }}>{p.title}</div>
               <div style={{ fontSize: '8px', color: 'var(--tx2)' }}>{p.date}</div>
             </div>
