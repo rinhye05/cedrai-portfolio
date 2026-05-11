@@ -26,7 +26,7 @@ export default function Projects() {
 
       <div className="proj-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
         {PROJECTS.map((p) => (
-          <a key={p.title} href={p.link} style={{ textDecoration: 'none' }}>
+          <a key={p.title} href="#" style={{ textDecoration: 'none' }}>
             <div
               className={`clip-card hud-corner ${p.red ? 'hud-corner-red' : ''}`}
               style={{ background: 'var(--bg2)', padding: '1.2rem', cursor: 'pointer', transition: 'outline .2s' }}
