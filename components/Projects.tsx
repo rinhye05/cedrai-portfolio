@@ -6,10 +6,10 @@ const PROJECTS = [
     red: false,
     status: 'ACTIVE',
     progress: 80,
-    title: 'seKUrity 소모임 서버',
-    desc: '보안 소모임 seKUrity 공식 웹사이트. 순수 HTML/CSS/JS로 제작 중.',
+    title: 'seKUrity 서버',
+    desc: '보안 소모임 seKUrity 웹사이트. 순수 HTML/CSS/JS로 제작 중.',
     tags: ['HTML', 'CSS', 'JS', 'VERCEL'],
-    link: '#',
+    link: 'https://se-k-urity.vercel.app/',
   },
 ]
 
@@ -62,6 +62,22 @@ export default function Projects() {
                     <div key={i} style={{ flex: 1, height: '2px', background: i < Math.floor(p.progress / 10) ? 'var(--acc)' : 'var(--bd)' }} />
                   ))}
                 </div>
+              </div>
+
+              {/* 링크 */}
+              <div style={{ marginBottom: '.7rem' }}>
+                <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '9px', color: 'var(--tx2)', letterSpacing: '.08em', textDecoration: 'none' }}>
+                  <span style={{ color: 'var(--acc)', marginRight: '4px' }}>//</span>
+                  {p.link}
+                </a>
+              </div>
+
+              {/* 링크 */}
+              <div style={{ marginBottom: '.7rem' }}>
+                <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '9px', color: 'var(--tx2)', letterSpacing: '.08em', textDecoration: 'none' }}>
+                  <span style={{ color: 'var(--acc)', marginRight: '4px' }}>//</span>
+                  {p.link}
+                </a>
               </div>
 
               {/* 태그 */}
