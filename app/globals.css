@@ -4,7 +4,7 @@
 
 html, body {
   background: #000000 !important;
-  color: #ffaad8 !important;
+  color: #c8baff !important;
   font-size: 115%;
   font-family: 'Hack', 'Courier New', monospace !important;
 }
@@ -16,14 +16,14 @@ html, body {
 :root {
   color-scheme: dark;
   --bg: #000000;
-  --bg2: #0a0a0a;
-  --bg3: #111111;
-  --acc: #ff2d8a;
-  --acc2: #ff85c0;
-  --tx: #ffaad8;
-  --tx2: #ff77bb;
-  --txw: #ffd6e8;
-  --bd: #330011;
+  --bg2: #08070f;
+  --bg3: #100e1a;
+  --acc: #b7aefe;
+  --acc2: #d4c9ff;
+  --tx: #c8baff;
+  --tx2: #8877cc;
+  --txw: #ede8ff;
+  --bd: #2a1f55;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
