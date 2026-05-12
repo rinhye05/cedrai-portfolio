@@ -4,7 +4,7 @@
 
 html, body {
   background: #000000 !important;
-  color: #cc4488 !important;
+  color: #ff6eb4 !important;
   font-size: 102%;
   font-family: 'Hack', 'Courier New', monospace !important;
 }
@@ -20,8 +20,8 @@ html, body {
   --bg3: #111111;
   --acc: #ff2d8a;
   --acc2: #ff85c0;
-  --tx: #cc4488;
-  --tx2: #661133;
+  --tx: #ff6eb4;
+  --tx2: #cc3366;
   --txw: #ffd6e8;
   --bd: #330011;
 }
