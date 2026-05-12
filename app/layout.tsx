@@ -1,11 +1,5 @@
 import type { Metadata } from 'next'
-import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
-
-const jetbrains = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-})
 
 export const metadata: Metadata = {
   title: 'Cédrai_',
@@ -20,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={jetbrains.variable}>{children}</body>
+      <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hack-font@3/build/web/hack.css" />
+      </head>
+      <body style={{ fontFamily: "'Hack', 'Courier New', monospace" }}>{children}</body>
     </html>
   )
 }
