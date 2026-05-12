@@ -40,14 +40,14 @@ export default function About() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
 
         {/* 자기소개 + 사진 */}
-        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', display: 'flex', gap: '1.2rem', alignItems: 'flex-start' }}>
-          <div style={{ flexShrink: 0 }}>
-            <div style={{ width: '80px', height: '80px', border: '1px solid var(--acc)', overflow: 'hidden', position: 'relative' }}>
-              <Image src="/Suguru Geto.jpeg" alt="profile" fill style={{ objectFit: 'cover' }} />
+        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', display: 'flex', gap: '1.4rem', alignItems: 'stretch' }}>
+          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '120px', height: '120px', border: '1px solid var(--acc)', overflow: 'hidden', position: 'relative' }}>
+              <Image src="/Suguru Geto.jpeg" alt="profile" fill style={{ objectFit: 'cover', objectPosition: 'top' }} />
             </div>
-            <div style={{ fontSize: '7px', color: 'var(--acc)', letterSpacing: '.1em', marginTop: '5px', textAlign: 'center' }}>CÉDRAI</div>
+            <div style={{ fontSize: '8px', color: 'var(--acc)', letterSpacing: '.1em', textAlign: 'center' }}>CÉDRAI</div>
           </div>
-          <div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ fontSize: '8px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.8rem' }}>[ INTRODUCTION ]</div>
             {ABOUT.intro.map((line, i) => (
               <p key={i} style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.85, marginBottom: '.3rem' }}>{line}</p>
