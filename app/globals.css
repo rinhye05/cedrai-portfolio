@@ -4,8 +4,8 @@
 
 html, body {
   background: #000000 !important;
-  color: #c8baff !important;
-  font-size: 130%;
+  color: #e2d9ff !important;
+  font-size: 135%;
   font-family: 'Hack', 'Courier New', monospace !important;
 }
 
@@ -19,11 +19,13 @@ html, body {
   --bg2: #08070f;
   --bg3: #100e1a;
   --acc: #b7aefe;
-  --acc2: #d4c9ff;
-  --tx: #c8baff;
-  --tx2: #8877cc;
-  --txw: #ede8ff;
-  --bd: #2a1f55;
+  --acc2: #00f5d4;
+  --acc3: #ffd166;
+  --acc4: #ff6b6b;
+  --tx: #e8e0ff;
+  --tx2: #c0b0f0;
+  --txw: #ffffff;
+  --bd: #3a2f65;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -123,11 +125,11 @@ body {
 
 /* ── 섹션 헤더 태그 ── */
 .sec-tag {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: .2em;
   color: var(--bg);
   background: var(--acc);
-  padding: 3px 10px;
+  padding: 4px 12px;
   clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%);
   white-space: nowrap;
   font-weight: 700;
@@ -136,11 +138,11 @@ body {
 
 /* ── 버튼 ── */
 .btn-primary {
-  padding: 7px 16px;
+  padding: 9px 20px;
   border: 1px solid var(--acc);
   color: var(--acc);
   background: transparent;
-  font-size: 9px;
+  font-size: 13px;
   font-family: inherit;
   cursor: pointer;
   letter-spacing: .1em;
@@ -150,11 +152,11 @@ body {
 .btn-primary:hover { background: rgba(0, 229, 255, 0.08); }
 
 .btn-secondary {
-  padding: 7px 16px;
+  padding: 9px 20px;
   border: 1px solid var(--bd);
   color: var(--tx2);
   background: transparent;
-  font-size: 9px;
+  font-size: 13px;
   font-family: inherit;
   cursor: pointer;
   letter-spacing: .08em;

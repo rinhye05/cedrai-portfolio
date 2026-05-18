@@ -40,9 +40,9 @@ export default function Nav() {
             href={l.href}
             style={{
               color: 'var(--tx2)',
-              fontSize: '9px',
+              fontSize: '13px',
               textDecoration: 'none',
-              letterSpacing: '.14em',
+              letterSpacing: '.10em',
               transition: 'color .2s',
             }}
             onMouseEnter={(e) => ((e.target as HTMLElement).style.color = 'var(--acc)')}
@@ -54,8 +54,8 @@ export default function Nav() {
       </div>
 
       {/* 상태 표시 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>
-        <div className="scanner-pulse" style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--acc)' }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.1em' }}>
+        <div className="scanner-pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--acc2)' }} />
         SYS ONLINE
       </div>
     </nav>

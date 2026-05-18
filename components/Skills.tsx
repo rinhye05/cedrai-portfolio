@@ -18,7 +18,7 @@ export default function Skills() {
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc)' }} />
         </div>
-        <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://TECH_STACK</div>
+        <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://TECH_STACK</div>
       </div>
 
       {/* 스킬 그리드 */}

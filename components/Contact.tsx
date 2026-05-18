@@ -14,7 +14,7 @@ export default function Contact() {
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc)' }} />
         </div>
-        <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://CONTACT</div>
+        <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://CONTACT</div>
       </div>
 
       <div className="contact-wrap" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -26,10 +26,10 @@ export default function Contact() {
               onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'var(--acc)')}
               onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'var(--bd)')}
             >
-              <span style={{ fontSize: '10px', color: 'var(--acc)', fontWeight: 700 }}>{l.icon}</span>
+              <span style={{ fontSize: '14px', color: 'var(--acc)', fontWeight: 700 }}>{l.icon}</span>
               <div>
-                <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{l.label}</div>
-                <div style={{ fontSize: '10px', color: 'var(--tx)' }}>{l.value}</div>
+                <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{l.label}</div>
+                <div style={{ fontSize: '14px', color: 'var(--tx)' }}>{l.value}</div>
               </div>
             </div>
           </a>

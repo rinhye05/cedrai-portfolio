@@ -34,7 +34,7 @@ export default function Projects() {
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc2)' }} />
         </div>
-        <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SELECTED_WORKS</div>
+        <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SELECTED_WORKS</div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -46,8 +46,8 @@ export default function Projects() {
             >
               {/* 상단 */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.6rem' }}>
-                <div style={{ fontSize: '8px', letterSpacing: '.16em', color: 'var(--acc)' }}>{p.type}</div>
-                <div style={{ fontSize: '7px', color: '#00ff88', border: '1px solid #00ff88', padding: '1px 6px', letterSpacing: '.12em' }}>
+                <div style={{ fontSize: '12px', letterSpacing: '.16em', color: 'var(--acc)' }}>{p.type}</div>
+                <div style={{ fontSize: '11px', color: '#00ff88', border: '1px solid #00ff88', padding: '2px 8px', letterSpacing: '.12em' }}>
                   ● {p.status}
                 </div>
               </div>
@@ -56,13 +56,13 @@ export default function Projects() {
               <div style={{ fontSize: '13px', color: 'var(--txw)', fontWeight: 700, fontFamily: 'sans-serif', marginBottom: '.5rem' }}>{p.title}</div>
 
               {/* 설명 */}
-              <div style={{ fontSize: '10px', color: 'var(--tx2)', lineHeight: 1.7, fontFamily: 'sans-serif', marginBottom: '1rem' }}>{p.desc}</div>
+              <div style={{ fontSize: '14px', color: 'var(--tx2)', lineHeight: 1.7, fontFamily: 'sans-serif', marginBottom: '1rem' }}>{p.desc}</div>
 
               {/* 진행률 */}
               <div style={{ marginBottom: '.8rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>PROGRESS</span>
-                  <span style={{ fontSize: '8px', color: 'var(--acc)' }}>{p.progress}%</span>
+                  <span style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>PROGRESS</span>
+                  <span style={{ fontSize: '12px', color: 'var(--acc)' }}>{p.progress}%</span>
                 </div>
                 <div style={{ height: '1px', background: 'var(--bd)' }}>
                   <div style={{ height: '1px', width: `${p.progress}%`, background: 'var(--acc)', boxShadow: '0 0 6px var(--acc)' }} />
@@ -76,13 +76,13 @@ export default function Projects() {
 
               {/* 링크 + 타임라인 토글 */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.7rem' }}>
-                <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '9px', color: 'var(--tx2)', letterSpacing: '.08em', textDecoration: 'none' }}>
+                <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', color: 'var(--tx2)', letterSpacing: '.08em', textDecoration: 'none' }}>
                   <span style={{ color: 'var(--acc)', marginRight: '4px' }}>//</span>
                   {p.link}
                 </a>
                 <button
                   onClick={() => setOpenTimeline(openTimeline === p.title ? null : p.title)}
-                  style={{ fontSize: '8px', color: 'var(--acc)', background: 'transparent', border: '1px solid var(--acc)', padding: '2px 8px', cursor: 'pointer', letterSpacing: '.1em' }}
+                  style={{ fontSize: '12px', color: 'var(--acc)', background: 'transparent', border: '1px solid var(--acc)', padding: '2px 8px', cursor: 'pointer', letterSpacing: '.1em' }}
                 >
                   {openTimeline === p.title ? 'CLOSE' : 'TIMELINE ▾'}
                 </button>
@@ -91,7 +91,7 @@ export default function Projects() {
               {/* 태그 */}
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                 {p.tags.map((t) => (
-                  <span key={t} style={{ fontSize: '8px', border: '1px solid var(--bd)', color: 'var(--tx2)', padding: '1px 6px' }}>{t}</span>
+                  <span key={t} style={{ fontSize: '12px', border: '1px solid var(--bd)', color: 'var(--tx2)', padding: '1px 6px' }}>{t}</span>
                 ))}
               </div>
             </div>
@@ -111,8 +111,8 @@ export default function Projects() {
                     </div>
                     {/* 내용 */}
                     <div style={{ paddingTop: '4px' }}>
-                      <div style={{ fontSize: '10px', color: 'var(--txw)', fontWeight: 700, marginBottom: '3px', letterSpacing: '.06em' }}>{t.label}</div>
-                      <div style={{ fontSize: '9px', color: 'var(--tx2)', lineHeight: 1.7, fontFamily: 'sans-serif' }}>{t.desc}</div>
+                      <div style={{ fontSize: '13px', color: 'var(--txw)', fontWeight: 700, marginBottom: '3px', letterSpacing: '.06em' }}>{t.label}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--tx2)', lineHeight: 1.7, fontFamily: 'sans-serif' }}>{t.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -125,7 +125,7 @@ export default function Projects() {
         <div className="clip-card" style={{ background: 'var(--bg2)', padding: '1.2rem', border: '1px dashed var(--bd)', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '120px' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '20px', color: 'var(--tx2)', marginBottom: '4px' }}>+</div>
-            <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.12em' }}>MORE COMING SOON</div>
+            <div style={{ fontSize: '13px', color: 'var(--tx2)', letterSpacing: '.12em' }}>MORE COMING SOON</div>
           </div>
         </div>
       </div>

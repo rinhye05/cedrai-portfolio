@@ -85,7 +85,7 @@ export default function Hero() {
     <section id="about" className="scanlines" style={{ padding: '3rem 2rem 2.5rem', borderBottom: '1px solid var(--bd)', overflow: 'hidden' }}>
       <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: '2rem', alignItems: 'center', position: 'relative', zIndex: 1 }}>
         <div>
-          <div style={{ fontSize: '9px', color: 'var(--tx2)', letterSpacing: '.14em', marginBottom: '.6rem' }}>
+          <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.14em', marginBottom: '.6rem' }}>
             HANDLE: <span style={{ color: 'var(--acc)' }}>CÉDRAI</span> // KONKUK UNIV. GLOCAL · COMPUTER ENGINEERING
           </div>
 
@@ -97,7 +97,7 @@ export default function Hero() {
             {typed}
           </div>
 
-          <p style={{ fontSize: '10px', color: 'var(--tx2)', lineHeight: 1.85, maxWidth: '400px', marginBottom: '1.2rem', fontFamily: 'sans-serif' }}>
+          <p style={{ fontSize: '14px', color: 'var(--tx)', lineHeight: 1.85, maxWidth: '400px', marginBottom: '1.2rem', fontFamily: 'sans-serif' }}>
             현재 컴퓨터공학과에 재학중이며 보안 공부중입니다.<br />
             CTF · 포렌식 · 웹해킹 · 리버싱 · AI
           </p>
@@ -110,8 +110,8 @@ export default function Hero() {
           <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--bd)' }}>
             {STATS.map((s) => (
               <div key={s.label}>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: s.dim ? 'var(--tx2)' : 'var(--txw)' }}>{s.value}</div>
-                <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{s.label}</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: s.dim ? 'var(--tx2)' : 'var(--txw)' }}>{s.value}</div>
+                <div style={{ fontSize: '1px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{s.label}</div>
               </div>
             ))}
           </div>
