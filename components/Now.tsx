@@ -60,7 +60,7 @@ export default function Now() {
       </div>
 
       <p style={{ fontSize: '13px', color: 'var(--tx2)', marginBottom: '1.5rem', fontFamily: 'sans-serif', lineHeight: 1.7 }}>
-        요즘 뭐하고 있는지 기록하는 공간이에요. — inspired by <a href="https://nownownow.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--acc)' }}>nownownow.com</a>
+        요즘 뭐하고 있는지 기록하는 공간이에요.
       </p>
 
       {showForm && isAdmin && (
