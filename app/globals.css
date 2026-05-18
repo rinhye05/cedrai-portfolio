@@ -196,3 +196,10 @@ body {
   .blog-grid  { grid-template-columns: 1fr !important; }
   .contact-wrap { flex-direction: column; }
 }
+
+/* ── 모바일 패딩 ── */
+@media (max-width: 640px) {
+  section { padding: 1.2rem !important; }
+  .hero-grid { grid-template-columns: 1fr !important; }
+  .scanner-wrap { display: none !important; }
+}
