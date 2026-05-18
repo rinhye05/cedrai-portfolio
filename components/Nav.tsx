@@ -69,7 +69,7 @@ export default function Nav() {
         </Link>
 
         {/* 데스크탑 링크 */}
-        <div className="nav-desktop" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div className="nav-desktop" style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           {links.map((l) => (
             <Link key={l.label} href={l.href} style={{ color: 'var(--tx2)', fontSize: '12px', textDecoration: 'none', letterSpacing: '.08em', transition: 'color .2s' }}
               onMouseEnter={(e) => ((e.target as HTMLElement).style.color = 'var(--acc)')}
