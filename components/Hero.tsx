@@ -13,9 +13,9 @@ const PHRASES = [
 ]
 
 const STATS = [
-  { value: '5+',  label: 'CTF SOLVED'   },
-  { value: '2',   label: 'PROJECTS'     },
-  { value: '???', label: 'RANK TBD', dim: true },
+  { value: '5+',  label: 'CTF 문제 풀이' },
+  { value: '2',   label: '완성 프로젝트'  },
+  { value: '1',   label: '소속 보안팀'    },
 ]
 
 function useTyping(phrases: string[]) {
@@ -110,8 +110,8 @@ export default function Hero() {
           <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--bd)' }}>
             {STATS.map((s) => (
               <div key={s.label}>
-                <div style={{ fontSize: '22px', fontWeight: 700, color: s.dim ? 'var(--tx2)' : 'var(--txw)' }}>{s.value}</div>
-                <div style={{ fontSize: '1px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{s.label}</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--acc3)' }}>{s.value}</div>
+                <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{s.label}</div>
               </div>
             ))}
           </div>

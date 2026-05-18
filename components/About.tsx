@@ -57,7 +57,7 @@ export default function About() {
 
         {/* 학교/전공 */}
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem' }}>
-          <div style={{ fontSize: '2px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ EDUCATION ]</div>
+          <div style={{ fontSize: '12px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ EDUCATION ]</div>
           {ABOUT.education.map((item) => (
             <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.55rem', paddingBottom: '.55rem', borderBottom: '1px solid var(--bd)' }}>
               <span style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{item.label}</span>

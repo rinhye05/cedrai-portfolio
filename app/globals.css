@@ -203,3 +203,23 @@ body {
   .hero-grid { grid-template-columns: 1fr !important; }
   .scanner-wrap { display: none !important; }
 }
+
+/* ── 라이트 테마 ── */
+[data-theme="light"] {
+  --bg:  #f4f3ff;
+  --bg2: #eae8ff;
+  --bg3: #ddd9ff;
+  --acc: #5b4fcf;
+  --acc2: #00a896;
+  --acc3: #c47f00;
+  --acc4: #c0392b;
+  --tx:  #1a1730;
+  --tx2: #4a3f7a;
+  --txw: #0d0b1a;
+  --bd:  #c0b8f0;
+}
+
+[data-theme="light"] body {
+  background: var(--bg);
+  color: var(--tx);
+}

@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   keywords: ['CTF', 'Forensics', 'Security', 'Python', 'Portfolio'],
 }
 
+import { AuthProvider } from '@/lib/auth-context'
+
 export default function RootLayout({
   children,
 }: {
@@ -17,7 +19,9 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hack-font@3/build/web/hack.css" />
       </head>
-      <body style={{ fontFamily: "'Hack', 'Courier New', monospace" }}>{children}</body>
+      <body style={{ fontFamily: "'Hack', 'Courier New', monospace" }}>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }
