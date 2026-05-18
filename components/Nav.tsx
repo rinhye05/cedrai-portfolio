@@ -6,7 +6,7 @@ const links = [
   { label: 'ABOUT',    href: '/about'    },
   { label: 'PROJECTS', href: '/projects' },
   { label: 'BLOG',     href: '/blog'     },
-  { label: 'CONTACT',  href: '/contact'  },
+  { label: 'CONTACT',  href: '/#contact'  },
 ]
 
 export default function Nav() {
