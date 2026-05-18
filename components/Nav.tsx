@@ -1,13 +1,49 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const links = [
   { label: 'ABOUT',    href: '/about'    },
   { label: 'PROJECTS', href: '/projects' },
   { label: 'BLOG',     href: '/blog'     },
-  { label: 'CONTACT',  href: '/#contact'  },
 ]
+
+function ContactLink() {
+  const router = useRouter()
+
+  const handleClick = () => {
+    if (window.location.pathname === '/') {
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      router.push('/')
+      setTimeout(() => {
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+      }, 3000)
+    }
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      style={{
+        color: 'var(--tx2)',
+        fontSize: '13px',
+        textDecoration: 'none',
+        letterSpacing: '.10em',
+        transition: 'color .2s',
+        cursor: 'pointer',
+        background: 'none',
+        border: 'none',
+        fontFamily: 'inherit',
+      }}
+      onMouseEnter={(e) => ((e.target as HTMLElement).style.color = 'var(--acc)')}
+      onMouseLeave={(e) => ((e.target as HTMLElement).style.color = 'var(--tx2)')}
+    >
+      CONTACT
+    </button>
+  )
+}
 
 export default function Nav() {
   return (
@@ -51,6 +87,7 @@ export default function Nav() {
             {l.label}
           </Link>
         ))}
+        <ContactLink />
       </div>
 
       {/* 상태 표시 */}
