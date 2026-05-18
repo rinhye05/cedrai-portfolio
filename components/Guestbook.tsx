@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import type { User } from '@supabase/supabase-js'
 
 type Entry = { id: string; name: string; message: string; created_at: string }
 
@@ -11,6 +12,7 @@ export default function Guestbook() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [user, setUser] = useState<User | null>(null)
 
   const fetch = async () => {
     const { data } = await supabase
@@ -20,7 +22,17 @@ export default function Guestbook() {
     if (data) setEntries(data)
   }
 
-  useEffect(() => { fetch() }, [])
+  useEffect(() => {
+    fetch()
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null))
+    const { data: l } = supabase.auth.onAuthStateChange((_, s) => setUser(s?.user ?? null))
+    return () => l.subscription.unsubscribe()
+  }, [])
+
+  const deleteEntry = async (id: string) => {
+    await supabase.from('guestbook').delete().eq('id', id)
+    fetch()
+  }
 
   const submit = async () => {
     if (!name.trim() || !message.trim()) { setError('이름과 메시지를 입력해주세요.'); return }
@@ -89,7 +101,12 @@ export default function Guestbook() {
           <div key={e.id} className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', borderLeft: '2px solid var(--acc)', padding: '.9rem 1.2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
               <span style={{ fontSize: '13px', color: 'var(--acc)', fontWeight: 700 }}>{e.name}</span>
-              <span style={{ fontSize: '11px', color: 'var(--tx2)' }}>{new Date(e.created_at).toLocaleDateString('ko-KR')}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--tx2)' }}>{new Date(e.created_at).toLocaleDateString('ko-KR')}</span>
+                {user?.id === 'eed9606a-b42c-4197-8d58-7a6592ae91d8' && (
+                  <button onClick={() => deleteEntry(e.id)} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
+                )}
+              </div>
             </div>
             <div style={{ fontSize: '13px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.7 }}>{e.message}</div>
           </div>
