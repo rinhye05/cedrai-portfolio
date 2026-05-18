@@ -32,15 +32,17 @@ export default function Skills() {
             className={`hud-corner ${sk.red ? 'hud-corner-red' : ''}`}
             style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '.65rem .9rem' }}
           >
-            <div style={{ fontSize: '9px', color: 'var(--txw)', letterSpacing: '.06em', marginBottom: '5px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--txw)', letterSpacing: '.06em', marginBottom: '7px' }}>
               {sk.name}
             </div>
-            <div style={{ height: '1px', background: 'var(--bd)' }}>
+            <div style={{ height: '3px', background: 'var(--bd)', borderRadius: '2px' }}>
               <div
                 style={{
-                  height: '1px',
+                  height: '3px',
                   width: `${sk.pct}%`,
                   background: sk.red ? 'var(--acc2)' : 'var(--acc)',
+                  boxShadow: sk.red ? '0 0 6px var(--acc2)' : '0 0 6px var(--acc)',
+                  borderRadius: '2px',
                 }}
               />
             </div>
