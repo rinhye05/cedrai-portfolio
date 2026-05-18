@@ -19,7 +19,7 @@ function ContactLink() {
       router.push('/')
       setTimeout(() => {
         document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
-      }, 3000)
+      }, 100)
     }
   }
 
