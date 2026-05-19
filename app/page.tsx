@@ -14,16 +14,18 @@ import Footer from '@/components/Footer'
 export default function Home() {
   const [loaded, setLoaded] = useState(() => {
     if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('visited') === 'true'
+      const ts = sessionStorage.getItem('visited_at')
+      if (ts && Date.now() - Number(ts) < 10 * 60 * 1000) {
+        return true
+      }
     }
     return false
   })
 
   const handleDone = () => {
-    sessionStorage.setItem('visited', 'true')
+    sessionStorage.setItem('visited_at', String(Date.now()))
     setLoaded(true)
   }
-
   return (
     <>
       {!loaded && <LoadingScreen onDone={handleDone} />}
