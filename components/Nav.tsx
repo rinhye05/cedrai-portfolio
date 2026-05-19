@@ -41,11 +41,17 @@ export default function Nav() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
-  const [dark, setDark] = useState(true)
+  const [dark, setDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') !== 'light'
+    }
+    return true
+  })
   const { user, isAdmin, login, logout } = useAuth()
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark])
 
   const handleLogin = async () => {
