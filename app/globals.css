@@ -206,17 +206,17 @@ body {
 
 /* ── 라이트 테마 ── */
 [data-theme="light"] {
-  --bg:  #f4f3ff;
-  --bg2: #eae8ff;
-  --bg3: #ddd9ff;
-  --acc: #5b4fcf;
-  --acc2: #00a896;
-  --acc3: #c47f00;
-  --acc4: #c0392b;
-  --tx:  #1a1730;
-  --tx2: #4a3f7a;
-  --txw: #0d0b1a;
-  --bd:  #c0b8f0;
+  --bg:  #ffffff;
+  --bg2: #f5f5f5;
+  --bg3: #ebebeb;
+  --acc: #6c5ce7;
+  --acc2: #00b894;
+  --acc3: #e17055;
+  --acc4: #d63031;
+  --tx:  #2d2d2d;
+  --tx2: #666666;
+  --txw: #111111;
+  --bd:  #dddddd;
 }
 
 [data-theme="light"] body {
