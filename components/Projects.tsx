@@ -1,65 +1,111 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useCallback, useEffect, useState } from 'react'
+import { PROJECTS, type Project } from '@/lib/data'
 import { useAuth } from '@/lib/auth-context'
 
-type TimelineItem = { step: string; label: string; description: string }
-type Project = {
-  id: string; type: string; status: string; progress: number
-  title: string; description: string; tags: string[]; link: string
-  timeline: TimelineItem[]
-}
-
 const EMPTY_FORM = {
-  type: '[ COMPLETED ]', status: 'LIVE', progress: 100,
-  title: '', description: '', tags: '', link: '', timeline: '[]'
+  id: '', type: '[ COMPLETED ]', status: 'LIVE', progress: 100,
+  title: '', description: '', tags: '', link: '', timeline: '[]',
 }
 
 export default function Projects() {
   const { isAdmin } = useAuth()
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<Project[]>(PROJECTS)
+  const [sha, setSha] = useState('')
   const [openTimeline, setOpenTimeline] = useState<string | null>(null)
+
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
+  const [notice, setNotice] = useState<{ kind: 'ok' | 'err'; text: string; href?: string } | null>(null)
 
-  const fetchProjects = async () => {
-    const { data } = await supabase.from('projects').select('*').order('created_at')
-    if (data) setProjects(data)
+  // 로그인하면 GitHub의 최신 내용을 불러옵니다(재배포 전 수정분까지 반영).
+  const loadLatest = useCallback(async () => {
+    try {
+      const res = await fetch('/api/projects')
+      const data = await res.json()
+      if (!res.ok) { setNotice({ kind: 'err', text: data.error ?? '불러오기 실패' }); return }
+      setProjects(data.projects)
+      setSha(data.sha)
+    } catch {
+      setNotice({ kind: 'err', text: '서버에 연결할 수 없어요.' })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isAdmin) loadLatest()
+  }, [isAdmin, loadLatest])
+
+  const commit = async (next: Project[]) => {
+    setSaving(true)
+    setNotice(null)
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projects: next, sha }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setNotice({ kind: 'err', text: data.error ?? '저장 실패' }); return false }
+      setProjects(data.projects)
+      setSha(data.sha)
+      setNotice({ kind: 'ok', text: 'GitHub에 커밋했어요. 재배포되면 사이트에 반영됩니다.', href: data.commit })
+      return true
+    } catch {
+      setNotice({ kind: 'err', text: '서버에 연결할 수 없어요.' })
+      return false
+    } finally {
+      setSaving(false)
+    }
   }
 
-  useEffect(() => { fetchProjects() }, [])
-
   const saveProject = async () => {
-    if (!form.title) return
-    const payload = {
-      ...form,
+    if (!form.title.trim()) { setNotice({ kind: 'err', text: '제목은 필수예요.' }); return }
+
+    let timeline
+    try {
+      timeline = JSON.parse(form.timeline || '[]')
+    } catch {
+      setNotice({ kind: 'err', text: 'TIMELINE JSON 형식이 잘못됐어요.' })
+      return
+    }
+
+    const payload: Project = {
+      id: editId ?? `project-${Date.now()}`,
+      type: form.type,
+      status: form.status,
       progress: Number(form.progress),
+      title: form.title,
+      description: form.description,
       tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
-      timeline: JSON.parse(form.timeline || '[]'),
+      link: form.link,
+      timeline,
     }
-    if (editId) {
-      await supabase.from('projects').update(payload).eq('id', editId)
-    } else {
-      await supabase.from('projects').insert(payload)
+
+    const next = editId
+      ? projects.map(p => (p.id === editId ? payload : p))
+      : [...projects, payload]
+
+    if (await commit(next)) {
+      setForm(EMPTY_FORM); setShowForm(false); setEditId(null)
     }
-    setForm(EMPTY_FORM); setShowForm(false); setEditId(null); fetchProjects()
   }
 
   const deleteProject = async (id: string) => {
     if (!confirm('삭제할까요?')) return
-    await supabase.from('projects').delete().eq('id', id); fetchProjects()
+    await commit(projects.filter(p => p.id !== id))
   }
 
   const startEdit = (p: Project) => {
     setForm({
-      type: p.type, status: p.status, progress: p.progress,
+      id: p.id, type: p.type, status: p.status, progress: p.progress,
       title: p.title, description: p.description,
       tags: p.tags.join(', '), link: p.link,
       timeline: JSON.stringify(p.timeline, null, 2),
     })
-    setEditId(p.id); setShowForm(true)
+    setEditId(p.id); setShowForm(true); setNotice(null)
   }
 
   const inputStyle: React.CSSProperties = {
@@ -76,12 +122,21 @@ export default function Projects() {
         </div>
         <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SELECTED_WORKS</div>
         {isAdmin && (
-          <button onClick={() => { setForm(EMPTY_FORM); setEditId(null); setShowForm(!showForm) }}
+          <button onClick={() => { setForm(EMPTY_FORM); setEditId(null); setShowForm(!showForm); setNotice(null) }}
             className="btn-primary" style={{ fontSize: '11px', padding: '4px 10px' }}>
             {showForm && !editId ? 'CANCEL' : '+ ADD'}
           </button>
         )}
       </div>
+
+      {isAdmin && notice && (
+        <div style={{ fontSize: '12px', marginBottom: '1rem', padding: '8px 12px', border: '1px solid var(--bd)', background: 'var(--bg2)', color: notice.kind === 'ok' ? 'var(--acc2)' : 'var(--acc4)' }}>
+          {notice.text}
+          {notice.href && (
+            <a href={notice.href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--acc)', marginLeft: '8px' }}>커밋 보기 →</a>
+          )}
+        </div>
+      )}
 
       {/* 추가/수정 폼 */}
       {showForm && isAdmin && (
@@ -104,7 +159,9 @@ export default function Projects() {
           </div>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
             <button onClick={() => { setShowForm(false); setEditId(null) }} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
-            <button onClick={saveProject} className="btn-primary" style={{ fontSize: '12px' }}>./SAVE</button>
+            <button onClick={saveProject} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>
+              {saving ? 'COMMITTING...' : './SAVE'}
+            </button>
           </div>
         </div>
       )}
@@ -120,7 +177,7 @@ export default function Projects() {
                   {isAdmin && (
                     <>
                       <button onClick={() => startEdit(p)} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '2px 8px', fontFamily: 'inherit' }}>EDIT</button>
-                      <button onClick={() => deleteProject(p.id)} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
+                      <button onClick={() => deleteProject(p.id)} disabled={saving} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
                     </>
                   )}
                 </div>
@@ -140,10 +197,12 @@ export default function Projects() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.7rem' }}>
-                <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', color: 'var(--tx2)', textDecoration: 'none' }}>
-                  <span style={{ color: 'var(--acc)', marginRight: '4px' }}>//</span>{p.link}
-                </a>
-                {p.timeline?.length > 0 && (
+                {p.link ? (
+                  <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', color: 'var(--tx2)', textDecoration: 'none' }}>
+                    <span style={{ color: 'var(--acc)', marginRight: '4px' }}>//</span>{p.link}
+                  </a>
+                ) : <span />}
+                {p.timeline.length > 0 && (
                   <button onClick={() => setOpenTimeline(openTimeline === p.id ? null : p.id)}
                     style={{ fontSize: '12px', color: 'var(--acc)', background: 'transparent', border: '1px solid var(--acc)', padding: '2px 8px', cursor: 'pointer', letterSpacing: '.1em' }}>
                     {openTimeline === p.id ? 'CLOSE' : 'TIMELINE ▾'}
@@ -152,7 +211,7 @@ export default function Projects() {
               </div>
 
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                {p.tags?.map((t) => (
+                {p.tags.map((t) => (
                   <span key={t} style={{ fontSize: '12px', border: '1px solid var(--bd)', color: 'var(--acc3)', padding: '2px 8px' }}>{t}</span>
                 ))}
               </div>
@@ -160,8 +219,8 @@ export default function Projects() {
 
             {openTimeline === p.id && (
               <div style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', borderTop: 'none', padding: '1.2rem', display: 'flex', flexDirection: 'column' }}>
-                {p.timeline?.map((t, i) => (
-                  <div key={t.step} style={{ display: 'flex', gap: '1rem', paddingBottom: i < p.timeline.length - 1 ? '1rem' : '0', position: 'relative' }}>
+                {p.timeline.map((t, i) => (
+                  <div key={`${p.id}-${t.step}-${i}`} style={{ display: 'flex', gap: '1rem', paddingBottom: i < p.timeline.length - 1 ? '1rem' : '0', position: 'relative' }}>
                     {i < p.timeline.length - 1 && (
                       <div style={{ position: 'absolute', left: '15px', top: '24px', width: '1px', height: 'calc(100% - 8px)', background: 'var(--bd)' }} />
                     )}

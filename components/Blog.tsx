@@ -2,65 +2,32 @@
 
 import { useEffect, useState } from 'react'
 
-type Post = { cat: string; title: string; date: string; href: string }
+type Post = { id: string; title: string; href: string; date: string; locked: boolean }
+type Category = { name: string; path: string; count: number; posts: Post[] }
 
-const FALLBACK: Post[] = [
-  { cat: 'forensic',  title: '[DH] study_checker writeup',   date: '2026.05', href: 'https://rinhye05.tistory.com/23' },
-  { cat: 'dreamhack', title: '[DH] flask-forensics writeup', date: '2026.05', href: 'https://rinhye05.tistory.com/25' },
-  { cat: 'ctf',       title: '[Hacktheon] simple-sqli',      date: '2026.05', href: 'https://rinhye05.tistory.com/19' },
-]
+const BLOG_URL = 'https://rinhye05.tistory.com'
+const POSTS_PER_CATEGORY = 3
 
-const CAT_MAP: { key: string; label: string; color: string }[] = [
-  { key: 'forensic',  label: 'Forensic',  color: 'var(--acc2)' },
-  { key: 'dreamhack', label: 'DreamHack', color: '#ff6b35'     },
-  { key: 'ctf',       label: 'CTF',       color: '#ff9500'     },
-  { key: 'btlo',      label: 'BTLO',      color: '#22c55e'     },
-  { key: 'sekurity',  label: 'seKUrity',  color: '#a855f7'     },
-]
+// 대분류는 티스토리에서 그때그때 읽어오므로, 색은 이름 기준으로 고정 배정합니다.
+const PALETTE = ['var(--acc2)', '#ff6b35', '#ff9500', '#22c55e', '#a855f7', '#00f5d4', '#b7aefe', '#ffd166']
 
-// 티스토리 카테고리 태그 기반 분류
-// 대분류: Forensic, DreamHack, CTF, BTLO, seKU
-// 소분류: study/논문 → forensic | forensic/web-hacking/misc/reversing → dreamhack
-//         2026 헥테온 → ctf | btlo → btlo | 조사/실습 → sekurity
-function matchCat(category: string, title: string): string {
-  // 대분류만 추출 (Forensic/논문 → Forensic)
-  const top = category.split('/')[0].toLowerCase().trim()
-  const t = title.toLowerCase().trim()
-
-  // 공지 제외
-  if (!category || t === '블로그 소개' || t.includes('공지')) return 'skip'
-
-  if (top === 'forensic')              return 'forensic'
-  if (top === 'dreamhack')             return 'dreamhack'
-  if (top === 'ctf')                   return 'ctf'
-  if (top === 'btlo')                  return 'btlo'
-  if (top === 'seku' || top === 'sekurity') return 'sekurity'
-
-  return 'skip'
+function colorFor(name: string) {
+  let h = 0
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0
+  return PALETTE[h % PALETTE.length]
 }
 
 export default function Blog() {
-  const [posts, setPosts] = useState<Post[] | null>(null)
+  const [categories, setCategories] = useState<Category[] | null>(null)
 
   useEffect(() => {
     fetch('/api/blog')
       .then((r) => r.json())
-      .then((data: { title: string; href: string; date: string; category: string }[]) => {
-        if (!data?.length) { setPosts(FALLBACK); return }
-        const mapped: Post[] = data
-          .map((p) => ({ ...p, cat: matchCat(p.category, p.title) }))
-          .filter((p) => p.cat !== 'skip')
-        setPosts(mapped.length ? mapped : FALLBACK)
-      })
-      .catch(() => { setPosts(FALLBACK) })
+      .then((data: { categories: Category[] }) => setCategories(data.categories ?? []))
+      .catch(() => setCategories([]))
   }, [])
 
-  const grouped = CAT_MAP.map((c) => ({
-    ...c,
-    posts: (posts ?? []).filter((p) => p.cat === c.key).slice(0, 3),
-  })).filter((g) => g.posts.length > 0)
-
-  if (posts === null) return (
+  if (categories === null) return (
     <section id="blog" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
         <div className="sec-tag">INTEL LOG</div>
@@ -89,42 +56,56 @@ export default function Blog() {
         <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://RECENT_POSTS</div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-        {grouped.map((g) => (
-          <div key={g.key}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-              <div style={{ width: '3px', height: '16px', background: g.color, flexShrink: 0 }} />
-              <span style={{ fontSize: '11px', color: g.color, fontWeight: 700, letterSpacing: '.14em' }}>
-                {g.label.toUpperCase()}
-              </span>
-              <span style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>
-                {g.posts.length} POSTS
-              </span>
-              <div style={{ flex: 1, height: '1px', background: 'var(--bd)' }} />
-            </div>
+      {categories.length === 0 && (
+        <div style={{ fontSize: '13px', color: 'var(--tx2)', letterSpacing: '.1em' }}>
+          // 글을 불러오지 못했어요. <a href={BLOG_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--acc)' }}>블로그에서 보기 →</a>
+        </div>
+      )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '7px' }}>
-              {g.posts.map((p) => (
-                <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                  <div
-                    style={{
-                      background: 'var(--bg2)',
-                      border: '1px solid var(--bd)',
-                      borderLeft: `2px solid ${g.color}`,
-                      padding: '.8rem 1rem',
-                      transition: 'background .2s',
-                    }}
-                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--bg3)')}
-                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--bg2)')}
-                  >
-                    <div style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.45, marginBottom: '8px' }}>{p.title}</div>
-                    <div style={{ fontSize: '8px', color: 'var(--tx2)' }}>{p.date}</div>
-                  </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        {categories.map((c) => {
+          const color = colorFor(c.name)
+          return (
+            <div key={c.path}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+                <div style={{ width: '3px', height: '16px', background: color, flexShrink: 0 }} />
+                <a href={`${BLOG_URL}${c.path}`} target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '11px', color, fontWeight: 700, letterSpacing: '.14em', textDecoration: 'none' }}>
+                  {c.name.toUpperCase()}
                 </a>
-              ))}
+                <span style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>
+                  {c.count} POSTS
+                </span>
+                <div style={{ flex: 1, height: '1px', background: 'var(--bd)' }} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '7px' }}>
+                {c.posts.slice(0, POSTS_PER_CATEGORY).map((p) => (
+                  <a key={p.id} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <div
+                      style={{
+                        background: 'var(--bg2)',
+                        border: '1px solid var(--bd)',
+                        borderLeft: `2px solid ${color}`,
+                        padding: '.8rem 1rem',
+                        transition: 'background .2s',
+                        height: '100%',
+                      }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--bg3)')}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--bg2)')}
+                    >
+                      <div style={{ fontSize: '10px', color: 'var(--tx)', fontFamily: 'sans-serif', lineHeight: 1.45, marginBottom: '8px' }}>
+                        {p.locked && <span title="보호글" style={{ marginRight: '4px' }}>🔒</span>}
+                        {p.title}
+                      </div>
+                      <div style={{ fontSize: '8px', color: 'var(--tx2)' }}>{p.date}</div>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

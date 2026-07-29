@@ -1,42 +1,56 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import type { User } from '@supabase/supabase-js'
-
-const ADMIN_ID = 'eed9606a-b42c-4197-8d58-7a6592ae91d8'
 
 type AuthCtx = {
-  user: User | null
+  /** 로그인한 관리자 아이디. 비로그인이면 null */
+  adminId: string | null
   isAdmin: boolean
-  login: (email: string, password: string) => Promise<string>
+  ready: boolean
+  login: (id: string, password: string) => Promise<string>
   logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthCtx>({
-  user: null, isAdmin: false,
+  adminId: null, isAdmin: false, ready: false,
   login: async () => '', logout: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [adminId, setAdminId] = useState<string | null>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null))
-    const { data: l } = supabase.auth.onAuthStateChange((_, s) => setUser(s?.user ?? null))
-    return () => l.subscription.unsubscribe()
+    fetch('/api/me')
+      .then(r => r.json())
+      .then((d: { id: string | null }) => setAdminId(d.id ?? null))
+      .catch(() => setAdminId(null))
+      .finally(() => setReady(true))
   }, [])
 
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) return '이메일 또는 비밀번호가 틀렸어요.'
-    return ''
+  const login = async (id: string, password: string) => {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, password }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) return data.error ?? '로그인에 실패했어요.'
+      setAdminId(data.id)
+      return ''
+    } catch {
+      return '서버에 연결할 수 없어요.'
+    }
   }
 
-  const logout = async () => { await supabase.auth.signOut() }
+  const logout = async () => {
+    await fetch('/api/logout', { method: 'POST' }).catch(() => {})
+    setAdminId(null)
+  }
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin: user?.id === ADMIN_ID, login, logout }}>
+    <AuthContext.Provider value={{ adminId, isAdmin: adminId !== null, ready, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

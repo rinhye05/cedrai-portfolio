@@ -9,7 +9,6 @@ const links = [
   { label: 'ABOUT',     href: '/about'     },
   { label: 'PROJECTS',  href: '/projects'  },
   { label: 'BLOG',      href: '/blog'      },
-  { label: 'GUESTBOOK', href: '/guestbook' },
   { label: 'SCHEDULE',  href: '/schedule'  },
   { label: 'NOW',       href: '/now'       },
 ]
@@ -38,16 +37,17 @@ function ContactLink({ onClick }: { onClick?: () => void }) {
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
-  const [email, setEmail] = useState('')
+  const [adminIdInput, setAdminIdInput] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [loggingIn, setLoggingIn] = useState(false)
   const [dark, setDark] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') !== 'light'
     }
     return true
   })
-  const { user, isAdmin, login, logout } = useAuth()
+  const { isAdmin, login, logout } = useAuth()
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
@@ -55,9 +55,12 @@ export default function Nav() {
   }, [dark])
 
   const handleLogin = async () => {
-    const err = await login(email, password)
+    if (loggingIn) return
+    setLoggingIn(true)
+    const err = await login(adminIdInput, password)
+    setLoggingIn(false)
     if (err) { setLoginError(err); return }
-    setShowLogin(false); setEmail(''); setPassword(''); setLoginError('')
+    setShowLogin(false); setAdminIdInput(''); setPassword(''); setLoginError('')
   }
 
   const inputStyle: React.CSSProperties = {
@@ -100,9 +103,9 @@ export default function Nav() {
           </button>
 
           {/* 로그인/어드민 */}
-          {user ? (
+          {isAdmin ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {isAdmin && <span style={{ fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.08em' }}>ADMIN</span>}
+              <span style={{ fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.08em' }}>ADMIN</span>
               <button onClick={logout} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '3px 8px', fontFamily: 'inherit' }}>LOGOUT</button>
             </div>
           ) : (
@@ -117,14 +120,17 @@ export default function Nav() {
       </nav>
 
       {/* 로그인 드롭다운 */}
-      {showLogin && !user && (
+      {showLogin && !isAdmin && (
         <div style={{ position: 'fixed', top: '52px', right: '1.2rem', zIndex: 200, background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '8px', width: '260px' }}>
           <div style={{ fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.14em' }}>[ ADMIN LOGIN ]</div>
-          <input value={email} onChange={e => setEmail(e.target.value)} placeholder="EMAIL" type="email" style={inputStyle} />
-          <input value={password} onChange={e => setPassword(e.target.value)} placeholder="PASSWORD" type="password" style={inputStyle}
+          <input value={adminIdInput} onChange={e => setAdminIdInput(e.target.value)} placeholder="ID" autoComplete="username" style={inputStyle}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+          <input value={password} onChange={e => setPassword(e.target.value)} placeholder="PASSWORD" type="password" autoComplete="current-password" style={inputStyle}
             onKeyDown={e => e.key === 'Enter' && handleLogin()} />
           {loginError && <div style={{ fontSize: '11px', color: 'var(--acc4)' }}>{loginError}</div>}
-          <button onClick={handleLogin} className="btn-primary" style={{ alignSelf: 'flex-end', fontSize: '11px' }}>./LOGIN</button>
+          <button onClick={handleLogin} disabled={loggingIn} className="btn-primary" style={{ alignSelf: 'flex-end', fontSize: '11px' }}>
+            {loggingIn ? '...' : './LOGIN'}
+          </button>
         </div>
       )}
 

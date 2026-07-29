@@ -1,13 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
-
-type Event = { id: string; title: string; date: string; description: string; color: string }
-type Todo  = { id: string; date: string; content: string; done: boolean }
-
-const COLORS = ['#b7aefe', '#00f5d4', '#ffd166', '#ff6b6b', '#22c55e', '#a855f7']
+import { useState } from 'react'
+import { SCHEDULE_EVENTS, TODOS } from '@/lib/data'
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate()
@@ -20,89 +14,24 @@ function toDateStr(year: number, month: number, day: number) {
   return `${year}-${pad(month + 1)}-${pad(day)}`
 }
 
+const events = [...SCHEDULE_EVENTS].sort((a, b) => a.date.localeCompare(b.date))
+const eventDates = new Set(events.map(e => e.date))
+const todoDates  = new Set(TODOS.map(t => t.date))
+
 export default function Schedule() {
-  const { isAdmin } = useAuth()
   const today = new Date()
   const [viewYear,  setViewYear]  = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
   const [selected,  setSelected]  = useState(toDateStr(today.getFullYear(), today.getMonth(), today.getDate()))
 
-  const [events,    setEvents]    = useState<Event[]>([])
-  const [todos,     setTodos]     = useState<Todo[]>([])
-  const [showEForm, setShowEForm] = useState(false)
-  const [editEvent, setEditEvent] = useState<Event | null>(null)
-  const [editTodo,  setEditTodo]  = useState<Todo | null>(null)
-  const [eForm, setEForm] = useState({ title: '', date: selected, description: '', color: '#b7aefe' })
-  const [todoInput, setTodoInput] = useState('')
-  const [todoEditInput, setTodoEditInput] = useState('')
-
-  const fetchEvents = async () => {
-    const { data } = await supabase.from('schedule').select('*').order('date')
-    if (data) setEvents(data)
-  }
-  const fetchTodos = async () => {
-    const { data } = await supabase.from('todos').select('*').order('created_at')
-    if (data) setTodos(data)
-  }
-
-  useEffect(() => { fetchEvents(); fetchTodos() }, [])
-
-  const addEvent = async () => {
-    if (!eForm.title || !eForm.date) return
-    if (editEvent) {
-      await supabase.from('schedule').update(eForm).eq('id', editEvent.id)
-      setEditEvent(null)
-    } else {
-      await supabase.from('schedule').insert(eForm)
-    }
-    setEForm({ title: '', date: selected, description: '', color: '#b7aefe' })
-    setShowEForm(false); fetchEvents()
-  }
-
-  const deleteEvent = async (id: string) => {
-    await supabase.from('schedule').delete().eq('id', id); fetchEvents()
-  }
-
-  const startEditEvent = (e: Event) => {
-    setEForm({ title: e.title, date: e.date, description: e.description, color: e.color })
-    setEditEvent(e); setShowEForm(true)
-  }
-
-  const addTodo = async () => {
-    if (!todoInput.trim()) return
-    await supabase.from('todos').insert({ date: selected, content: todoInput.trim(), done: false })
-    setTodoInput(''); fetchTodos()
-  }
-
-  const saveTodoEdit = async () => {
-    if (!editTodo || !todoEditInput.trim()) return
-    await supabase.from('todos').update({ content: todoEditInput }).eq('id', editTodo.id)
-    setEditTodo(null); setTodoEditInput(''); fetchTodos()
-  }
-
-  const toggleTodo = async (t: Todo) => {
-    await supabase.from('todos').update({ done: !t.done }).eq('id', t.id); fetchTodos()
-  }
-
-  const deleteTodo = async (id: string) => {
-    await supabase.from('todos').delete().eq('id', id); fetchTodos()
-  }
-
   const daysInMonth = getDaysInMonth(viewYear, viewMonth)
   const firstDay    = getFirstDay(viewYear, viewMonth)
   const cells       = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)]
-  const eventDates  = new Set(events.map(e => e.date))
-  const todoDates   = new Set(todos.map(t => t.date))
   const selectedEvents = events.filter(e => e.date === selected)
-  const selectedTodos  = todos.filter(t => t.date === selected)
+  const selectedTodos  = TODOS.filter(t => t.date === selected)
 
   const prevMonth = () => { if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11) } else setViewMonth(m => m - 1) }
   const nextMonth = () => { if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0) } else setViewMonth(m => m + 1) }
-
-  const inputStyle: React.CSSProperties = {
-    background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)',
-    fontFamily: 'inherit', fontSize: '13px', padding: '8px 12px', outline: 'none', width: '100%',
-  }
 
   const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
   const DAYS   = ['SUN','MON','TUE','WED','THU','FRI','SAT']
@@ -115,7 +44,6 @@ export default function Schedule() {
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc2)' }} />
         </div>
         <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SCHEDULE</div>
-        {isAdmin && <span style={{ fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.08em' }}>ADMIN MODE</span>}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -146,7 +74,7 @@ export default function Schedule() {
               const hasTodo = todoDates.has(dateStr)
               const col     = i % 7
               return (
-                <div key={day} onClick={() => { setSelected(dateStr); setEForm(f => ({ ...f, date: dateStr })) }}
+                <div key={day} onClick={() => setSelected(dateStr)}
                   style={{
                     textAlign: 'center', padding: '7px 2px', cursor: 'pointer', position: 'relative',
                     background: isSel ? 'var(--acc)' : isToday ? 'rgba(183,174,254,0.15)' : 'transparent',
@@ -177,48 +105,15 @@ export default function Schedule() {
 
           {/* 이벤트 */}
           <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.8rem' }}>
-              <div style={{ fontSize: '12px', color: 'var(--acc2)', letterSpacing: '.14em' }}>[ EVENTS ]</div>
-              {isAdmin && (
-                <button onClick={() => { setEditEvent(null); setEForm({ title: '', date: selected, description: '', color: '#b7aefe' }); setShowEForm(!showEForm) }}
-                  style={{ fontSize: '11px', color: 'var(--acc)', background: 'none', border: '1px solid var(--acc)', padding: '2px 8px', cursor: 'pointer', fontFamily: 'inherit' }}>
-                  {showEForm && !editEvent ? 'CANCEL' : '+ ADD'}
-                </button>
-              )}
-            </div>
+            <div style={{ fontSize: '12px', color: 'var(--acc2)', letterSpacing: '.14em', marginBottom: '.8rem' }}>[ EVENTS ]</div>
 
-            {showEForm && isAdmin && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px', padding: '10px', background: 'var(--bg3)', border: '1px solid var(--bd)' }}>
-                <input value={eForm.title} onChange={e => setEForm({ ...eForm, title: e.target.value })} placeholder="TITLE" style={inputStyle} />
-                <textarea value={eForm.description} onChange={e => setEForm({ ...eForm, description: e.target.value })} placeholder="DESCRIPTION (선택)" rows={2} style={{ ...inputStyle, resize: 'none' }} />
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--tx2)' }}>COLOR:</span>
-                  {COLORS.map(c => (
-                    <div key={c} onClick={() => setEForm({ ...eForm, color: c })} style={{ width: '16px', height: '16px', borderRadius: '50%', background: c, cursor: 'pointer', border: eForm.color === c ? '2px solid white' : '2px solid transparent' }} />
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                  <button onClick={() => { setShowEForm(false); setEditEvent(null) }} className="btn-secondary" style={{ fontSize: '11px' }}>CANCEL</button>
-                  <button onClick={addEvent} className="btn-primary" style={{ fontSize: '11px' }}>./SAVE</button>
-                </div>
-              </div>
-            )}
-
-            {selectedEvents.length === 0 && !showEForm && (
+            {selectedEvents.length === 0 && (
               <div style={{ fontSize: '13px', color: 'var(--tx2)' }}>// 이벤트 없음</div>
             )}
             {selectedEvents.map(e => (
-              <div key={e.id} style={{ borderLeft: `2px solid ${e.color}`, paddingLeft: '10px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <div style={{ fontSize: '14px', color: 'var(--txw)', fontWeight: 700 }}>{e.title}</div>
-                  {e.description && <div style={{ fontSize: '12px', color: 'var(--tx2)', marginTop: '2px' }}>{e.description}</div>}
-                </div>
-                {isAdmin && (
-                  <div style={{ display: 'flex', gap: '4px', flexShrink: 0, marginLeft: '8px' }}>
-                    <button onClick={() => startEditEvent(e)} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '1px 6px', fontFamily: 'inherit' }}>EDIT</button>
-                    <button onClick={() => deleteEvent(e.id)} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
-                  </div>
-                )}
+              <div key={e.id} style={{ borderLeft: `2px solid ${e.color}`, paddingLeft: '10px', marginBottom: '8px' }}>
+                <div style={{ fontSize: '14px', color: 'var(--txw)', fontWeight: 700 }}>{e.title}</div>
+                {e.description && <div style={{ fontSize: '12px', color: 'var(--tx2)', marginTop: '2px' }}>{e.description}</div>}
               </div>
             ))}
           </div>
@@ -227,39 +122,15 @@ export default function Schedule() {
           <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem' }}>
             <div style={{ fontSize: '12px', color: 'var(--acc3)', letterSpacing: '.14em', marginBottom: '.8rem' }}>[ TODO ]</div>
 
-            {isAdmin && (
-              <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                <input value={todoInput} onChange={e => setTodoInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTodo()} placeholder="할 일 입력 후 Enter" style={{ ...inputStyle, flex: 1 }} />
-                <button onClick={addTodo} className="btn-primary" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>ADD</button>
-              </div>
-            )}
-
             {selectedTodos.length === 0 && (
               <div style={{ fontSize: '13px', color: 'var(--tx2)' }}>// 투두 없음</div>
             )}
             {selectedTodos.map(t => (
-              <div key={t.id} style={{ marginBottom: '8px' }}>
-                {editTodo?.id === t.id ? (
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <input value={todoEditInput} onChange={e => setTodoEditInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && saveTodoEdit()} style={{ ...inputStyle, flex: 1 }} autoFocus />
-                    <button onClick={saveTodoEdit} className="btn-primary" style={{ fontSize: '11px' }}>SAVE</button>
-                    <button onClick={() => setEditTodo(null)} className="btn-secondary" style={{ fontSize: '11px' }}>✕</button>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div onClick={() => isAdmin && toggleTodo(t)}
-                      style={{ width: '18px', height: '18px', border: `1px solid ${t.done ? 'var(--acc2)' : 'var(--bd)'}`, background: t.done ? 'var(--acc2)' : 'transparent', cursor: isAdmin ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {t.done && <span style={{ fontSize: '11px', color: 'var(--bg)', fontWeight: 700 }}>✓</span>}
-                    </div>
-                    <span style={{ fontSize: '14px', color: t.done ? 'var(--tx2)' : 'var(--tx)', textDecoration: t.done ? 'line-through' : 'none', flex: 1, fontFamily: 'sans-serif' }}>{t.content}</span>
-                    {isAdmin && (
-                      <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-                        <button onClick={() => { setEditTodo(t); setTodoEditInput(t.content) }} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '1px 6px', fontFamily: 'inherit' }}>EDIT</button>
-                        <button onClick={() => deleteTodo(t.id)} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
-                      </div>
-                    )}
-                  </div>
-                )}
+              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <div style={{ width: '18px', height: '18px', border: `1px solid ${t.done ? 'var(--acc2)' : 'var(--bd)'}`, background: t.done ? 'var(--acc2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {t.done && <span style={{ fontSize: '11px', color: 'var(--bg)', fontWeight: 700 }}>✓</span>}
+                </div>
+                <span style={{ fontSize: '14px', color: t.done ? 'var(--tx2)' : 'var(--tx)', textDecoration: t.done ? 'line-through' : 'none', flex: 1, fontFamily: 'sans-serif' }}>{t.content}</span>
               </div>
             ))}
           </div>
