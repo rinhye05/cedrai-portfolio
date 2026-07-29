@@ -1,65 +1,22 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PROJECTS, type Project } from '@/lib/data'
-import { useAuth } from '@/lib/auth-context'
+import { useEditable } from '@/lib/use-editable'
+import Notice from '@/components/Notice'
 
 const EMPTY_FORM = {
-  id: '', type: '[ COMPLETED ]', status: 'LIVE', progress: 100,
+  type: '[ COMPLETED ]', status: 'LIVE', progress: 100,
   title: '', description: '', tags: '', link: '', timeline: '[]',
 }
 
 export default function Projects() {
-  const { isAdmin } = useAuth()
-  const [projects, setProjects] = useState<Project[]>(PROJECTS)
-  const [sha, setSha] = useState('')
-  const [openTimeline, setOpenTimeline] = useState<string | null>(null)
+  const { isAdmin, items: projects, saving, notice, setNotice, commit } = useEditable<Project>('projects', PROJECTS)
 
+  const [openTimeline, setOpenTimeline] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
-  const [saving, setSaving] = useState(false)
-  const [notice, setNotice] = useState<{ kind: 'ok' | 'err'; text: string; href?: string } | null>(null)
-
-  // 로그인하면 GitHub의 최신 내용을 불러옵니다(재배포 전 수정분까지 반영).
-  const loadLatest = useCallback(async () => {
-    try {
-      const res = await fetch('/api/projects')
-      const data = await res.json()
-      if (!res.ok) { setNotice({ kind: 'err', text: data.error ?? '불러오기 실패' }); return }
-      setProjects(data.projects)
-      setSha(data.sha)
-    } catch {
-      setNotice({ kind: 'err', text: '서버에 연결할 수 없어요.' })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (isAdmin) loadLatest()
-  }, [isAdmin, loadLatest])
-
-  const commit = async (next: Project[]) => {
-    setSaving(true)
-    setNotice(null)
-    try {
-      const res = await fetch('/api/projects', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projects: next, sha }),
-      })
-      const data = await res.json()
-      if (!res.ok) { setNotice({ kind: 'err', text: data.error ?? '저장 실패' }); return false }
-      setProjects(data.projects)
-      setSha(data.sha)
-      setNotice({ kind: 'ok', text: 'GitHub에 커밋했어요. 재배포되면 사이트에 반영됩니다.', href: data.commit })
-      return true
-    } catch {
-      setNotice({ kind: 'err', text: '서버에 연결할 수 없어요.' })
-      return false
-    } finally {
-      setSaving(false)
-    }
-  }
 
   const saveProject = async () => {
     if (!form.title.trim()) { setNotice({ kind: 'err', text: '제목은 필수예요.' }); return }
@@ -100,7 +57,7 @@ export default function Projects() {
 
   const startEdit = (p: Project) => {
     setForm({
-      id: p.id, type: p.type, status: p.status, progress: p.progress,
+      type: p.type, status: p.status, progress: p.progress,
       title: p.title, description: p.description,
       tags: p.tags.join(', '), link: p.link,
       timeline: JSON.stringify(p.timeline, null, 2),
@@ -115,12 +72,12 @@ export default function Projects() {
 
   return (
     <section id="projects" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.2rem' }}>
+      <div className="sec-head" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.2rem' }}>
         <div className="sec-tag sec-tag-red">PROJECTS</div>
-        <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
+        <div className="sec-rule" style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc2)' }} />
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SELECTED_WORKS</div>
+        <div className="sec-path" style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SELECTED_WORKS</div>
         {isAdmin && (
           <button onClick={() => { setForm(EMPTY_FORM); setEditId(null); setShowForm(!showForm); setNotice(null) }}
             className="btn-primary" style={{ fontSize: '11px', padding: '4px 10px' }}>
@@ -129,20 +86,13 @@ export default function Projects() {
         )}
       </div>
 
-      {isAdmin && notice && (
-        <div style={{ fontSize: '12px', marginBottom: '1rem', padding: '8px 12px', border: '1px solid var(--bd)', background: 'var(--bg2)', color: notice.kind === 'ok' ? 'var(--acc2)' : 'var(--acc4)' }}>
-          {notice.text}
-          {notice.href && (
-            <a href={notice.href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--acc)', marginLeft: '8px' }}>커밋 보기 →</a>
-          )}
-        </div>
-      )}
+      {isAdmin && <Notice notice={notice} />}
 
       {/* 추가/수정 폼 */}
       {showForm && isAdmin && (
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', marginBottom: '1.2rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ fontSize: '12px', color: 'var(--acc)', letterSpacing: '.14em' }}>[ {editId ? 'EDIT' : 'NEW'} PROJECT ]</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="TITLE *" style={inputStyle} />
             <input value={form.link} onChange={e => setForm({...form, link: e.target.value})} placeholder="LINK (https://...)" style={inputStyle} />
             <input value={form.type} onChange={e => setForm({...form, type: e.target.value})} placeholder="TYPE ([ COMPLETED ])" style={inputStyle} />
@@ -157,7 +107,7 @@ export default function Projects() {
               placeholder={`[\n  {"step":"01","label":"기획","description":"설명"}\n]`}
               rows={6} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'monospace', fontSize: '11px' }} />
           </div>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <button onClick={() => { setShowForm(false); setEditId(null) }} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
             <button onClick={saveProject} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>
               {saving ? 'COMMITTING...' : './SAVE'}
@@ -170,9 +120,9 @@ export default function Projects() {
         {projects.map((p) => (
           <div key={p.id}>
             <div className="clip-card hud-corner" style={{ background: 'var(--bg2)', padding: '1.2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.6rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '.6rem', flexWrap: 'wrap' }}>
                 <div style={{ fontSize: '12px', letterSpacing: '.16em', color: 'var(--acc)' }}>{p.type}</div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <div style={{ fontSize: '11px', color: '#00ff88', border: '1px solid #00ff88', padding: '2px 8px', letterSpacing: '.12em' }}>● {p.status}</div>
                   {isAdmin && (
                     <>
@@ -196,15 +146,15 @@ export default function Projects() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.7rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '.7rem', flexWrap: 'wrap' }}>
                 {p.link ? (
-                  <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', color: 'var(--tx2)', textDecoration: 'none' }}>
+                  <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '13px', color: 'var(--tx2)', textDecoration: 'none', overflowWrap: 'anywhere', minWidth: 0 }}>
                     <span style={{ color: 'var(--acc)', marginRight: '4px' }}>//</span>{p.link}
                   </a>
                 ) : <span />}
                 {p.timeline.length > 0 && (
                   <button onClick={() => setOpenTimeline(openTimeline === p.id ? null : p.id)}
-                    style={{ fontSize: '12px', color: 'var(--acc)', background: 'transparent', border: '1px solid var(--acc)', padding: '2px 8px', cursor: 'pointer', letterSpacing: '.1em' }}>
+                    style={{ fontSize: '12px', color: 'var(--acc)', background: 'transparent', border: '1px solid var(--acc)', padding: '2px 8px', cursor: 'pointer', letterSpacing: '.1em', whiteSpace: 'nowrap' }}>
                     {openTimeline === p.id ? 'CLOSE' : 'TIMELINE ▾'}
                   </button>
                 )}
@@ -225,7 +175,7 @@ export default function Projects() {
                       <div style={{ position: 'absolute', left: '15px', top: '24px', width: '1px', height: 'calc(100% - 8px)', background: 'var(--bd)' }} />
                     )}
                     <div style={{ flexShrink: 0, width: '30px', height: '30px', border: '1px solid var(--acc)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: 'var(--acc)', background: 'var(--bg2)', zIndex: 1 }}>{t.step}</div>
-                    <div style={{ paddingTop: '4px' }}>
+                    <div style={{ paddingTop: '4px', minWidth: 0 }}>
                       <div style={{ fontSize: '13px', color: 'var(--txw)', fontWeight: 700, marginBottom: '3px' }}>{t.label}</div>
                       <div style={{ fontSize: '12px', color: 'var(--tx2)', lineHeight: 1.7, fontFamily: 'sans-serif' }}>{t.description}</div>
                     </div>

@@ -2,6 +2,7 @@
 // PROJECTS만 예외로 data/projects.json 에 있습니다 (관리자 화면에서 편집 가능).
 
 import projectsJson from '@/data/projects.json'
+import nowJson from '@/data/now.json'
 
 export type TimelineItem = { step: string; label: string; description: string }
 
@@ -53,7 +54,5 @@ export const SCHEDULE_EVENTS: ScheduleEvent[] = []
 // { id: 't1', date: '2026-08-14', content: '워게임 문제 복습', done: false },
 export const TODOS: Todo[] = []
 
-// 예시:
-// { id: 'n1', content: '요즘 포렌식 공부 중이에요.',
-//   created_at: '2026-07-29T09:00:00+09:00', updated_at: '2026-07-29T09:00:00+09:00' },
-export const NOW_POSTS: NowPost[] = []
+/** 배포 시점에 번들된 NOW 기록. 관리자가 저장하면 GitHub에 커밋되고 재배포되면서 갱신됩니다. */
+export const NOW_POSTS: NowPost[] = nowJson as NowPost[]

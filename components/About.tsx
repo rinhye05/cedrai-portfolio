@@ -29,18 +29,18 @@ const ABOUT = {
 export default function About() {
   return (
     <section id="about-detail" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.8rem' }}>
+      <div className="sec-head" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.8rem' }}>
         <div className="sec-tag">ABOUT</div>
-        <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
+        <div className="sec-rule" style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc)' }} />
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://PROFILE</div>
+        <div className="sec-path" style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://PROFILE</div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+      <div className="split-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
 
         {/* 자기소개 + 사진 */}
-        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', display: 'flex', gap: '1.4rem', alignItems: 'stretch' }}>
+        <div className="hud-corner intro-card" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem', display: 'flex', gap: '1.4rem', alignItems: 'stretch' }}>
           <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
             <div style={{ width: '120px', height: '120px', border: '1px solid var(--acc)', overflow: 'hidden', position: 'relative' }}>
               <Image src="/Suguru Geto.jpeg" alt="profile" fill style={{ objectFit: 'cover', objectPosition: 'top' }} />
@@ -59,7 +59,7 @@ export default function About() {
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem' }}>
           <div style={{ fontSize: '12px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ EDUCATION ]</div>
           {ABOUT.education.map((item) => (
-            <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.55rem', paddingBottom: '.55rem', borderBottom: '1px solid var(--bd)' }}>
+            <div key={item.label} className="kv-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '.55rem', paddingBottom: '.55rem', borderBottom: '1px solid var(--bd)' }}>
               <span style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{item.label}</span>
               <span style={{ fontSize: '13px', color: 'var(--txw)', fontFamily: 'sans-serif' }}>{item.value}</span>
             </div>
@@ -88,7 +88,7 @@ export default function About() {
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1.2rem' }}>
           <div style={{ fontSize: '12px', color: 'var(--acc)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ ACTIVITY ]</div>
           {ABOUT.activities.map((item) => (
-            <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.55rem', paddingBottom: '.55rem', borderBottom: '1px solid var(--bd)' }}>
+            <div key={item.label} className="kv-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '8px', marginBottom: '.55rem', paddingBottom: '.55rem', borderBottom: '1px solid var(--bd)' }}>
               <span style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.12em' }}>{item.label}</span>
               <span style={{ fontSize: '13px', color: 'var(--txw)', fontFamily: 'sans-serif' }}>{item.value}</span>
             </div>
@@ -100,7 +100,7 @@ export default function About() {
           <div style={{ fontSize: '12px', color: 'var(--acc2)', letterSpacing: '.18em', marginBottom: '.9rem' }}>[ CLUBS & ACTIVITIES ]</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {ABOUT.clubs.map((c, i) => (
-              <div key={i} className="hud-corner" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', padding: '.7rem 1rem', minWidth: '180px' }}>
+              <div key={i} className="hud-corner club-card" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', padding: '.7rem 1rem', minWidth: '180px' }}>
                 <div style={{ fontSize: '14px', color: 'var(--txw)', fontWeight: 700, marginBottom: '4px' }}>{c.name}</div>
                 <div style={{ fontSize: '12px', color: 'var(--acc2)', marginBottom: '3px' }}>{c.role}</div>
                 <div style={{ fontSize: '11px', color: 'var(--tx2)' }}>{c.period}</div>

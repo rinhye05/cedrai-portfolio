@@ -10,7 +10,6 @@ function config() {
     token,
     repo,
     branch: process.env.GITHUB_BRANCH || 'main',
-    path: process.env.GITHUB_FILE_PATH || 'data/projects.json',
   }
 }
 
@@ -28,11 +27,11 @@ function headers(token: string) {
 export type FileState = { content: string; sha: string }
 
 /** 파일의 현재 내용과 sha를 가져옵니다. 없으면 sha가 빈 문자열. */
-export async function readFile(): Promise<FileState> {
+export async function readFile(path: string): Promise<FileState> {
   const c = config()
   if (!c) throw new Error('GitHub 환경변수가 설정되지 않았습니다.')
 
-  const url = `${API}/repos/${c.repo}/contents/${encodeURI(c.path)}?ref=${encodeURIComponent(c.branch)}`
+  const url = `${API}/repos/${c.repo}/contents/${encodeURI(path)}?ref=${encodeURIComponent(c.branch)}`
   const res = await fetch(url, { headers: headers(c.token), cache: 'no-store' })
 
   if (res.status === 404) return { content: '', sha: '' }
@@ -49,11 +48,11 @@ export async function readFile(): Promise<FileState> {
  * 파일을 커밋합니다. sha가 현재 파일과 다르면 GitHub이 409를 돌려주므로
  * 다른 곳에서 먼저 수정한 내용을 덮어쓰는 사고를 막아줍니다.
  */
-export async function writeFile(content: string, sha: string, message: string) {
+export async function writeFile(path: string, content: string, sha: string, message: string) {
   const c = config()
   if (!c) throw new Error('GitHub 환경변수가 설정되지 않았습니다.')
 
-  const url = `${API}/repos/${c.repo}/contents/${encodeURI(c.path)}`
+  const url = `${API}/repos/${c.repo}/contents/${encodeURI(path)}`
   const res = await fetch(url, {
     method: 'PUT',
     headers: { ...headers(c.token), 'Content-Type': 'application/json' },

@@ -32,7 +32,7 @@ export default function Blog() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
         <div className="sec-tag">INTEL LOG</div>
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)' }} />
-        <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://RECENT_POSTS</div>
+        <div className="sec-path" style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://RECENT_POSTS</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {[...Array(3)].map((_, i) => (
@@ -53,7 +53,7 @@ export default function Blog() {
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '40px', height: '1px', background: 'var(--acc)' }} />
         </div>
-        <div style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://RECENT_POSTS</div>
+        <div className="sec-path" style={{ fontSize: '8px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://RECENT_POSTS</div>
       </div>
 
       {categories.length === 0 && (
