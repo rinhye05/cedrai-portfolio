@@ -51,5 +51,18 @@
         "description": "관리자 계정 분리 · Admin 페이지 멤버 관리 · 일반 유저 본인 카드만 수정"
       }
     ]
+  },
+  {
+    "id": "tmp-verify",
+    "type": "[ TEST ]",
+    "status": "TEST",
+    "progress": 50,
+    "title": "동작확인용 임시항목",
+    "description": "",
+    "tags": [
+      "TEST"
+    ],
+    "link": "",
+    "timeline": []
   }
 ]
