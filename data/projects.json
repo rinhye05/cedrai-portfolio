@@ -1,0 +1,55 @@
+[
+  {
+    "id": "sekurity-website",
+    "type": "[ COMPLETED ]",
+    "status": "LIVE",
+    "progress": 100,
+    "title": "seKUrity 소모임 공식 웹사이트",
+    "description": "보안 소모임 seKUrity 공식 웹사이트. 사이버펑크 HUD 테마 기반 UI, 회원 관리 시스템, Supabase 백엔드 연동.",
+    "tags": [
+      "HTML",
+      "CSS",
+      "JS",
+      "SUPABASE",
+      "VERCEL"
+    ],
+    "link": "https://se-k-urity.vercel.app/",
+    "timeline": [
+      {
+        "step": "01",
+        "label": "기획 & 디자인",
+        "description": "사이버펑크 HUD 테마 UI 설계. 스캔라인, 글리치, 커스텀 커서 구현"
+      },
+      {
+        "step": "02",
+        "label": "프론트엔드 개발",
+        "description": "로딩 인트로 / Hero·About·Activities·Achievements·Members·Contact 섹션 / 반응형 / 스크롤 애니메이션"
+      },
+      {
+        "step": "03",
+        "label": "배포 환경 구축",
+        "description": "GitHub 연동 · Vercel 자동 배포 파이프라인 (push → 자동 반영)"
+      },
+      {
+        "step": "04",
+        "label": "콘텐츠 작성",
+        "description": "활동 분야 7개 · 수상 경력 13건 · 부원 13명 카드 구성"
+      },
+      {
+        "step": "05",
+        "label": "부원 소개 페이지",
+        "description": "members.html 별도 제작. 직책별 카드, 관심분야 태그, 블로그 링크 연동"
+      },
+      {
+        "step": "06",
+        "label": "Supabase 연동",
+        "description": "PostgreSQL DB 설계 · Row Level Security · 회원가입/로그인/로그아웃"
+      },
+      {
+        "step": "07",
+        "label": "권한 시스템",
+        "description": "관리자 계정 분리 · Admin 페이지 멤버 관리 · 일반 유저 본인 카드만 수정"
+      }
+    ]
+  }
+]
