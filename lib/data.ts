@@ -3,6 +3,7 @@
 
 import projectsJson from '@/data/projects.json'
 import nowJson from '@/data/now.json'
+import scheduleJson from '@/data/schedule.json'
 
 export type TimelineItem = { step: string; label: string; description: string }
 
@@ -33,6 +34,11 @@ export type Todo = {
   done: boolean
 }
 
+export type ScheduleData = {
+  events: ScheduleEvent[]
+  todos: Todo[]
+}
+
 export type NowPost = {
   id: string
   content: string
@@ -45,14 +51,16 @@ export const EVENT_COLORS = ['#b7aefe', '#00f5d4', '#ffd166', '#ff6b6b', '#22c55
 /** 배포 시점에 번들된 프로젝트 목록. 관리자가 저장하면 GitHub에 커밋되고 재배포되면서 갱신됩니다. */
 export const PROJECTS: Project[] = projectsJson as Project[]
 
+export const SCHEDULE_DATA: ScheduleData = scheduleJson as ScheduleData
+
 // 예시:
 // { id: 'ctf-2026', title: 'CTF 본선', date: '2026-08-15',
 //   description: '오프라인 참가', color: EVENT_COLORS[0] },
-export const SCHEDULE_EVENTS: ScheduleEvent[] = []
+export const SCHEDULE_EVENTS: ScheduleEvent[] = SCHEDULE_DATA.events
 
 // 예시:
 // { id: 't1', date: '2026-08-14', content: '워게임 문제 복습', done: false },
-export const TODOS: Todo[] = []
+export const TODOS: Todo[] = SCHEDULE_DATA.todos
 
 /** 배포 시점에 번들된 NOW 기록. 관리자가 저장하면 GitHub에 커밋되고 재배포되면서 갱신됩니다. */
 export const NOW_POSTS: NowPost[] = nowJson as NowPost[]

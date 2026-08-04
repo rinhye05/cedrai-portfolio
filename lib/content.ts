@@ -1,16 +1,16 @@
 // 관리자가 화면에서 편집할 수 있는 콘텐츠 정의.
 // 레포에 커밋되는 내용이라 저장 전에 모양을 강제로 맞춥니다.
 
-import { NOW_POSTS, PROJECTS, type NowPost, type Project } from '@/lib/data'
+import { EVENT_COLORS, NOW_POSTS, PROJECTS, SCHEDULE_DATA, type NowPost, type Project, type ScheduleData, type ScheduleEvent, type Todo } from '@/lib/data'
 
 const str = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback)
 
-export type ContentKind = 'projects' | 'now'
+export type ContentKind = 'projects' | 'now' | 'schedule'
 
 type Definition = {
   path: string
-  fallback: unknown[]
-  sanitize: (input: unknown) => unknown[]
+  fallback: unknown
+  sanitize: (input: unknown) => unknown
   label: string
 }
 
@@ -69,9 +69,49 @@ function sanitizeNow(input: unknown): NowPost[] {
   })
 }
 
+function sanitizeSchedule(input: unknown): ScheduleData {
+  if (typeof input !== 'object' || input === null || Array.isArray(input)) throw new Error('schedule는 객체이어야 합니다.')
+
+  const raw = input as Record<string, unknown>
+  const sanitizeEvent = (item: unknown, i: number): ScheduleEvent => {
+    const p = (item ?? {}) as Record<string, unknown>
+    const title = str(p.title).trim()
+    if (!title) throw new Error(`${i + 1}번째 일정에 제목이 없습니다.`)
+    const date = str(p.date).trim()
+    if (!date) throw new Error(`${i + 1}번째 일정에 날짜가 없습니다.`)
+    return {
+      id: str(p.id).trim() || `event-${Date.now()}-${i}`,
+      title,
+      date,
+      description: str(p.description),
+      color: str(p.color, EVENT_COLORS[i % EVENT_COLORS.length]),
+    }
+  }
+
+  const sanitizeTodo = (item: unknown, i: number): Todo => {
+    const p = (item ?? {}) as Record<string, unknown>
+    const content = str(p.content).trim()
+    if (!content) throw new Error(`${i + 1}번째 할 일 내용이 비어 있습니다.`)
+    const date = str(p.date).trim()
+    if (!date) throw new Error(`${i + 1}번째 할 일 날짜가 없습니다.`)
+    return {
+      id: str(p.id).trim() || `todo-${Date.now()}-${i}`,
+      date,
+      content,
+      done: p.done === true,
+    }
+  }
+
+  const events = Array.isArray(raw.events) ? raw.events.map((item, i) => sanitizeEvent(item, i)) : []
+  const todos = Array.isArray(raw.todos) ? raw.todos.map((item, i) => sanitizeTodo(item, i)) : []
+
+  return { events, todos }
+}
+
 export const CONTENT: Record<ContentKind, Definition> = {
   projects: { path: 'data/projects.json', fallback: PROJECTS, sanitize: sanitizeProjects, label: 'projects' },
   now:      { path: 'data/now.json',      fallback: NOW_POSTS, sanitize: sanitizeNow,      label: 'now' },
+  schedule: { path: 'data/schedule.json', fallback: SCHEDULE_DATA, sanitize: sanitizeSchedule, label: 'schedule' },
 }
 
 export const isContentKind = (v: string): v is ContentKind => v in CONTENT

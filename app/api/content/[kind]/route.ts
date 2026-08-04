@@ -13,18 +13,21 @@ function requireAdmin(request: NextRequest) {
 }
 
 /** 인증 · 종류 · GitHub 설정을 한 번에 확인합니다. */
-function guard(request: NextRequest, kind: string) {
+function guard(request: NextRequest, kind: string, requireAuth = false) {
   if (!isContentKind(kind)) {
     return { error: NextResponse.json({ error: '알 수 없는 콘텐츠 종류예요.' }, { status: 404 }) }
   }
-  const adminId = requireAdmin(request)
-  if (!adminId) {
-    return { error: NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 }) }
+  if (requireAuth) {
+    const adminId = requireAdmin(request)
+    if (!adminId) {
+      return { error: NextResponse.json({ error: '로그인이 필요해요.' }, { status: 401 }) }
+    }
+    if (!isGithubConfigured()) {
+      return { error: NextResponse.json({ error: 'GITHUB_TOKEN / GITHUB_REPO 환경변수가 설정되지 않았어요.' }, { status: 503 }) }
+    }
+    return { adminId, def: CONTENT[kind] }
   }
-  if (!isGithubConfigured()) {
-    return { error: NextResponse.json({ error: 'GITHUB_TOKEN / GITHUB_REPO 환경변수가 설정되지 않았어요.' }, { status: 503 }) }
-  }
-  return { adminId, def: CONTENT[kind] }
+  return { def: CONTENT[kind] }
 }
 
 export async function GET(request: NextRequest, { params }: Ctx) {
@@ -32,20 +35,24 @@ export async function GET(request: NextRequest, { params }: Ctx) {
   const g = guard(request, kind)
   if (g.error) return g.error
 
+  if (!isGithubConfigured()) {
+    return NextResponse.json({ items: g.def.fallback, sha: '' })
+  }
+
   try {
     const { content, sha } = await readFile(g.def.path)
     // 레포에 파일이 아직 없으면 번들된 내용을 보여줍니다. 그래야 첫 저장 때
     // 기존 항목이 빈 배열로 덮어써지지 않아요.
-    const items = content ? JSON.parse(content) : g.def.fallback
+    const items = content ? g.def.sanitize(JSON.parse(content)) : g.def.fallback
     return NextResponse.json({ items, sha })
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 })
+    return NextResponse.json({ items: g.def.fallback, sha: '' })
   }
 }
 
 export async function PUT(request: NextRequest, { params }: Ctx) {
   const { kind } = await params
-  const g = guard(request, kind)
+  const g = guard(request, kind, true)
   if (g.error) return g.error
 
   let items: unknown[]

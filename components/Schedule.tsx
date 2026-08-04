@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { SCHEDULE_EVENTS, TODOS } from '@/lib/data'
+import { useEffect, useState } from 'react'
+import { EVENT_COLORS, SCHEDULE_DATA, type ScheduleData } from '@/lib/data'
+import { useEditable } from '@/lib/use-editable'
+import Notice from '@/components/Notice'
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate()
@@ -14,27 +16,92 @@ function toDateStr(year: number, month: number, day: number) {
   return `${year}-${pad(month + 1)}-${pad(day)}`
 }
 
-const events = [...SCHEDULE_EVENTS].sort((a, b) => a.date.localeCompare(b.date))
-const eventDates = new Set(events.map(e => e.date))
-const todoDates  = new Set(TODOS.map(t => t.date))
-
 export default function Schedule() {
+  const { isAdmin, items: scheduleData, saving, notice, setNotice, commit } = useEditable<ScheduleData>('schedule', SCHEDULE_DATA)
+
   const today = new Date()
   const [viewYear,  setViewYear]  = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
   const [selected,  setSelected]  = useState(toDateStr(today.getFullYear(), today.getMonth(), today.getDate()))
+  const [showEventForm, setShowEventForm] = useState(false)
+  const [showTodoForm, setShowTodoForm] = useState(false)
+  const [eventForm, setEventForm] = useState({ date: selected, title: '', description: '', color: EVENT_COLORS[0] })
+  const [todoForm, setTodoForm] = useState({ date: selected, content: '', done: false })
+
+  useEffect(() => {
+    setEventForm(prev => ({ ...prev, date: selected }))
+    setTodoForm(prev => ({ ...prev, date: selected }))
+  }, [selected])
+
+  const events = [...scheduleData.events].sort((a, b) => a.date.localeCompare(b.date))
+  const todos = [...scheduleData.todos].sort((a, b) => a.date.localeCompare(b.date))
+  const eventDates = new Set(events.map(e => e.date))
+  const todoDates  = new Set(todos.map(t => t.date))
 
   const daysInMonth = getDaysInMonth(viewYear, viewMonth)
   const firstDay    = getFirstDay(viewYear, viewMonth)
   const cells       = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)]
   const selectedEvents = events.filter(e => e.date === selected)
-  const selectedTodos  = TODOS.filter(t => t.date === selected)
+  const selectedTodos  = todos.filter(t => t.date === selected)
 
   const prevMonth = () => { if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11) } else setViewMonth(m => m - 1) }
   const nextMonth = () => { if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0) } else setViewMonth(m => m + 1) }
 
   const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
   const DAYS   = ['SUN','MON','TUE','WED','THU','FRI','SAT']
+
+  const addEvent = async () => {
+    const title = eventForm.title.trim()
+    if (!title) {
+      setNotice({ kind: 'err', text: '일정 제목을 입력해주세요.' })
+      return
+    }
+
+    const next: ScheduleData = {
+      ...scheduleData,
+      events: [
+        ...scheduleData.events,
+        {
+          id: `event-${Date.now()}`,
+          title,
+          date: eventForm.date,
+          description: eventForm.description.trim(),
+          color: eventForm.color,
+        },
+      ],
+    }
+
+    if (await commit(next)) {
+      setEventForm({ date: selected, title: '', description: '', color: EVENT_COLORS[0] })
+      setShowEventForm(false)
+    }
+  }
+
+  const addTodo = async () => {
+    const content = todoForm.content.trim()
+    if (!content) {
+      setNotice({ kind: 'err', text: '할 일 내용을 입력해주세요.' })
+      return
+    }
+
+    const next: ScheduleData = {
+      ...scheduleData,
+      todos: [
+        ...scheduleData.todos,
+        {
+          id: `todo-${Date.now()}`,
+          date: todoForm.date,
+          content,
+          done: todoForm.done,
+        },
+      ],
+    }
+
+    if (await commit(next)) {
+      setTodoForm({ date: selected, content: '', done: false })
+      setShowTodoForm(false)
+    }
+  }
 
   return (
     <section id="schedule" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
@@ -45,6 +112,51 @@ export default function Schedule() {
         </div>
         <div className="sec-path" style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://SCHEDULE</div>
       </div>
+
+      {isAdmin && (
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+          <button onClick={() => { setShowEventForm(v => !v); setShowTodoForm(false) }} className="btn-primary" style={{ fontSize: '11px', padding: '4px 10px' }}>
+            {showEventForm ? 'CANCEL EVENT' : '+ ADD EVENT'}
+          </button>
+          <button onClick={() => { setShowTodoForm(v => !v); setShowEventForm(false) }} className="btn-secondary" style={{ fontSize: '11px', padding: '4px 10px' }}>
+            {showTodoForm ? 'CANCEL TODO' : '+ ADD TODO'}
+          </button>
+        </div>
+      )}
+
+      {isAdmin && <Notice notice={notice} />}
+
+      {isAdmin && showEventForm && (
+        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--acc)', letterSpacing: '.14em' }}>[ NEW EVENT ]</div>
+          <input type="date" value={eventForm.date} onChange={e => setEventForm({ ...eventForm, date: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
+          <input value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })} placeholder="제목" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
+          <textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} placeholder="설명" rows={3} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px', resize: 'vertical' }} />
+          <select value={eventForm.color} onChange={e => setEventForm({ ...eventForm, color: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }}>
+            {EVENT_COLORS.map(color => <option key={color} value={color} style={{ color: 'var(--bg)' }}>{color}</option>)}
+          </select>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <button onClick={() => setShowEventForm(false)} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
+            <button onClick={addEvent} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>{saving ? 'COMMITTING...' : './SAVE'}</button>
+          </div>
+        </div>
+      )}
+
+      {isAdmin && showTodoForm && (
+        <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--acc3)', letterSpacing: '.14em' }}>[ NEW TODO ]</div>
+          <input type="date" value={todoForm.date} onChange={e => setTodoForm({ ...todoForm, date: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
+          <input value={todoForm.content} onChange={e => setTodoForm({ ...todoForm, content: e.target.value })} placeholder="할 일" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
+          <label style={{ fontSize: '13px', color: 'var(--tx2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <input type="checkbox" checked={todoForm.done} onChange={e => setTodoForm({ ...todoForm, done: e.target.checked })} />
+            완료됨
+          </label>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <button onClick={() => setShowTodoForm(false)} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
+            <button onClick={addTodo} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>{saving ? 'COMMITTING...' : './SAVE'}</button>
+          </div>
+        </div>
+      )}
 
       <div className="split-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
 
