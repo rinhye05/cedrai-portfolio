@@ -62,6 +62,41 @@
       "date": "2026-08-18",
       "description": "학교 본 수강신청",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830619148-0",
+      "title": "가족 여행",
+      "date": "2026-08-22",
+      "description": "가족과 함께 일본 여행",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830619148-1",
+      "title": "가족 여행",
+      "date": "2026-08-23",
+      "description": "가족과 함께 일본 여행",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830619148-2",
+      "title": "가족 여행",
+      "date": "2026-08-24",
+      "description": "가족과 함께 일본 여행",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830619148-3",
+      "title": "가족 여행",
+      "date": "2026-08-25",
+      "description": "가족과 함께 일본 여행",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830619148-4",
+      "title": "가족 여행",
+      "date": "2026-08-26",
+      "description": "가족과 함께 일본 여행",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
