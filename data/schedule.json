@@ -55,6 +55,13 @@
       "date": "2026-08-13",
       "description": "케이묵 클라우드 보안 수업",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830588356-0",
+      "title": "수강신청",
+      "date": "2026-08-18",
+      "description": "학교 본 수강신청",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
