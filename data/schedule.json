@@ -1,4 +1,19 @@
 {
-  "events": [],
+  "events": [
+    {
+      "id": "event-1785830489408-0",
+      "title": "수강바구니",
+      "date": "2026-08-04",
+      "description": "학교 수강바구니 신청",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830489408-1",
+      "title": "수강바구니",
+      "date": "2026-08-05",
+      "description": "학교 수강바구니 신청",
+      "color": "#b7aefe"
+    }
+  ],
   "todos": []
 }
