@@ -11,7 +11,7 @@ const EMPTY_FORM = {
 }
 
 export default function Projects() {
-  const { isAdmin, items: projects, saving, notice, setNotice, commit } = useEditable<Project>('projects', PROJECTS)
+  const { isAdmin, items: projects, saving, notice, setNotice, commit } = useEditable<Project[]>('projects', PROJECTS)
 
   const [openTimeline, setOpenTimeline] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)

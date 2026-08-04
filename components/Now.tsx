@@ -6,7 +6,7 @@ import { useEditable } from '@/lib/use-editable'
 import Notice from '@/components/Notice'
 
 export default function Now() {
-  const { isAdmin, items, saving, notice, setNotice, commit } = useEditable<NowPost>('now', NOW_POSTS)
+  const { isAdmin, items, saving, notice, setNotice, commit } = useEditable<NowPost[]>('now', NOW_POSTS)
 
   const [content, setContent] = useState('')
   const [editId, setEditId] = useState<string | null>(null)
