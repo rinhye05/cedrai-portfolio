@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest, { params }: Ctx) {
   const g = guard(request, kind, true)
   if (g.error) return g.error
 
-  let items: unknown[]
+  let items: unknown
   let sha: string
   try {
     const body = await request.json()
