@@ -15,6 +15,15 @@ function pad(n: number) { return String(n).padStart(2, '0') }
 function toDateStr(year: number, month: number, day: number) {
   return `${year}-${pad(month + 1)}-${pad(day)}`
 }
+function parseDate(value: string) {
+  const [y, m, d] = value.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+function addDays(value: string, count: number) {
+  const date = parseDate(value)
+  date.setDate(date.getDate() + count)
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
 
 export default function Schedule() {
   const { isAdmin, items: scheduleData, saving, notice, setNotice, commit } = useEditable<ScheduleData>('schedule', SCHEDULE_DATA)
@@ -25,12 +34,12 @@ export default function Schedule() {
   const [selected,  setSelected]  = useState(toDateStr(today.getFullYear(), today.getMonth(), today.getDate()))
   const [showEventForm, setShowEventForm] = useState(false)
   const [showTodoForm, setShowTodoForm] = useState(false)
-  const [eventForm, setEventForm] = useState({ date: selected, title: '', description: '', color: EVENT_COLORS[0] })
-  const [todoForm, setTodoForm] = useState({ date: selected, content: '', done: false })
+  const [eventForm, setEventForm] = useState({ startDate: selected, endDate: selected, title: '', description: '', color: EVENT_COLORS[0] })
+  const [todoForm, setTodoForm] = useState({ startDate: selected, endDate: selected, content: '', done: false })
 
   useEffect(() => {
-    setEventForm(prev => ({ ...prev, date: selected }))
-    setTodoForm(prev => ({ ...prev, date: selected }))
+    setEventForm(prev => ({ ...prev, startDate: selected, endDate: prev.endDate || selected }))
+    setTodoForm(prev => ({ ...prev, startDate: selected, endDate: prev.endDate || selected }))
   }, [selected])
 
   const events = [...scheduleData.events].sort((a, b) => a.date.localeCompare(b.date))
@@ -57,22 +66,37 @@ export default function Schedule() {
       return
     }
 
+    const start = eventForm.startDate
+    const end = eventForm.endDate
+    const startDate = parseDate(start)
+    const endDate = parseDate(end)
+    if (endDate < startDate) {
+      setNotice({ kind: 'err', text: '종료 날짜는 시작 날짜보다 늦어야 해요.' })
+      return
+    }
+
+    const dates: string[] = []
+    let cursor = start
+    while (cursor <= end) {
+      dates.push(cursor)
+      cursor = addDays(cursor, 1)
+    }
+
+    const nextEvents = dates.map((date, index) => ({
+      id: `event-${Date.now()}-${index}`,
+      title,
+      date,
+      description: eventForm.description.trim(),
+      color: eventForm.color,
+    }))
+
     const next: ScheduleData = {
       ...scheduleData,
-      events: [
-        ...scheduleData.events,
-        {
-          id: `event-${Date.now()}`,
-          title,
-          date: eventForm.date,
-          description: eventForm.description.trim(),
-          color: eventForm.color,
-        },
-      ],
+      events: [...scheduleData.events, ...nextEvents],
     }
 
     if (await commit(next)) {
-      setEventForm({ date: selected, title: '', description: '', color: EVENT_COLORS[0] })
+      setEventForm({ startDate: selected, endDate: selected, title: '', description: '', color: EVENT_COLORS[0] })
       setShowEventForm(false)
     }
   }
@@ -84,21 +108,36 @@ export default function Schedule() {
       return
     }
 
+    const start = todoForm.startDate
+    const end = todoForm.endDate
+    const startDate = parseDate(start)
+    const endDate = parseDate(end)
+    if (endDate < startDate) {
+      setNotice({ kind: 'err', text: '종료 날짜는 시작 날짜보다 늦어야 해요.' })
+      return
+    }
+
+    const dates: string[] = []
+    let cursor = start
+    while (cursor <= end) {
+      dates.push(cursor)
+      cursor = addDays(cursor, 1)
+    }
+
+    const nextTodos = dates.map((date, index) => ({
+      id: `todo-${Date.now()}-${index}`,
+      date,
+      content,
+      done: todoForm.done,
+    }))
+
     const next: ScheduleData = {
       ...scheduleData,
-      todos: [
-        ...scheduleData.todos,
-        {
-          id: `todo-${Date.now()}`,
-          date: todoForm.date,
-          content,
-          done: todoForm.done,
-        },
-      ],
+      todos: [...scheduleData.todos, ...nextTodos],
     }
 
     if (await commit(next)) {
-      setTodoForm({ date: selected, content: '', done: false })
+      setTodoForm({ startDate: selected, endDate: selected, content: '', done: false })
       setShowTodoForm(false)
     }
   }
@@ -129,7 +168,16 @@ export default function Schedule() {
       {isAdmin && showEventForm && (
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ fontSize: '12px', color: 'var(--acc)', letterSpacing: '.14em' }}>[ NEW EVENT ]</div>
-          <input type="date" value={eventForm.date} onChange={e => setEventForm({ ...eventForm, date: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--tx2)' }}>
+              시작 날짜
+              <input type="date" value={eventForm.startDate} onChange={e => setEventForm({ ...eventForm, startDate: e.target.value })} style={{ marginTop: '4px', background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px', width: '100%' }} />
+            </label>
+            <label style={{ fontSize: '12px', color: 'var(--tx2)' }}>
+              종료 날짜
+              <input type="date" value={eventForm.endDate} onChange={e => setEventForm({ ...eventForm, endDate: e.target.value })} style={{ marginTop: '4px', background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px', width: '100%' }} />
+            </label>
+          </div>
           <input value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })} placeholder="제목" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
           <textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} placeholder="설명" rows={3} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px', resize: 'vertical' }} />
           <select value={eventForm.color} onChange={e => setEventForm({ ...eventForm, color: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }}>
@@ -145,7 +193,16 @@ export default function Schedule() {
       {isAdmin && showTodoForm && (
         <div className="hud-corner" style={{ background: 'var(--bg2)', border: '1px solid var(--bd)', padding: '1rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ fontSize: '12px', color: 'var(--acc3)', letterSpacing: '.14em' }}>[ NEW TODO ]</div>
-          <input type="date" value={todoForm.date} onChange={e => setTodoForm({ ...todoForm, date: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--tx2)' }}>
+              시작 날짜
+              <input type="date" value={todoForm.startDate} onChange={e => setTodoForm({ ...todoForm, startDate: e.target.value })} style={{ marginTop: '4px', background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px', width: '100%' }} />
+            </label>
+            <label style={{ fontSize: '12px', color: 'var(--tx2)' }}>
+              종료 날짜
+              <input type="date" value={todoForm.endDate} onChange={e => setTodoForm({ ...todoForm, endDate: e.target.value })} style={{ marginTop: '4px', background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px', width: '100%' }} />
+            </label>
+          </div>
           <input value={todoForm.content} onChange={e => setTodoForm({ ...todoForm, content: e.target.value })} placeholder="할 일" style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }} />
           <label style={{ fontSize: '13px', color: 'var(--tx2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input type="checkbox" checked={todoForm.done} onChange={e => setTodoForm({ ...todoForm, done: e.target.checked })} />
