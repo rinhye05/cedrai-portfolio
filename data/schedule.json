@@ -97,6 +97,13 @@
       "date": "2026-08-26",
       "description": "가족과 함께 일본 여행",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1785830632413-0",
+      "title": "GLT",
+      "date": "2026-08-15",
+      "description": "GLT 모임",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
