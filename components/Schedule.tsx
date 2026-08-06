@@ -92,11 +92,6 @@ export default function Schedule() {
       color: eventForm.color,
     }))
 
-    const next: ScheduleData = {
-      ...scheduleData,
-      events: [...scheduleData.events, ...nextEvents],
-    }
-
     if (eventEditId) {
       const next: ScheduleData = {
         ...scheduleData,
@@ -169,11 +164,6 @@ export default function Schedule() {
       content,
       done: todoForm.done,
     }))
-
-    const next: ScheduleData = {
-      ...scheduleData,
-      todos: [...scheduleData.todos, ...nextTodos],
-    }
 
     if (todoEditId) {
       const next: ScheduleData = {
