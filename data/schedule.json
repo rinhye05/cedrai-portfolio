@@ -132,6 +132,20 @@
       "date": "2026-08-08",
       "description": "가족과 영화 + 코엑스",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1786006953214-0",
+      "title": "자취방",
+      "date": "2026-08-20",
+      "description": "잠깐 자취방 가서 청소 + 정리",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1786006953214-1",
+      "title": "자취방",
+      "date": "2026-08-21",
+      "description": "잠깐 자취방 가서 청소 + 정리",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
