@@ -111,6 +111,13 @@
       "date": "2026-08-16",
       "description": "GTL 모임",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1786006863778-0",
+      "title": "약속",
+      "date": "2026-08-19",
+      "description": "친구와 약속",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
