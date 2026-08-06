@@ -104,6 +104,13 @@
       "date": "2026-08-15",
       "description": "GLT 모임",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1786006410939-0",
+      "title": "glt 모임",
+      "date": "2026-08-16",
+      "description": "glt 모임",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
