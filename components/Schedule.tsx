@@ -34,6 +34,8 @@ export default function Schedule() {
   const [selected,  setSelected]  = useState(toDateStr(today.getFullYear(), today.getMonth(), today.getDate()))
   const [showEventForm, setShowEventForm] = useState(false)
   const [showTodoForm, setShowTodoForm] = useState(false)
+  const [eventEditId, setEventEditId] = useState<string | null>(null)
+  const [todoEditId, setTodoEditId] = useState<string | null>(null)
   const [eventForm, setEventForm] = useState({ startDate: selected, endDate: selected, title: '', description: '', color: EVENT_COLORS[0] })
   const [todoForm, setTodoForm] = useState({ startDate: selected, endDate: selected, content: '', done: false })
 
@@ -95,10 +97,47 @@ export default function Schedule() {
       events: [...scheduleData.events, ...nextEvents],
     }
 
+    if (eventEditId) {
+      const next: ScheduleData = {
+        ...scheduleData,
+        events: scheduleData.events.map(e => e.id === eventEditId ? {
+          ...e,
+          title,
+          date: start,
+          description: eventForm.description.trim(),
+          color: eventForm.color,
+        } : e),
+      }
+      if (await commit(next)) {
+        setEventForm({ startDate: selected, endDate: selected, title: '', description: '', color: EVENT_COLORS[0] })
+        setEventEditId(null)
+        setShowEventForm(false)
+      }
+      return
+    }
+
+    const next: ScheduleData = {
+      ...scheduleData,
+      events: [...scheduleData.events, ...nextEvents],
+    }
+
     if (await commit(next)) {
       setEventForm({ startDate: selected, endDate: selected, title: '', description: '', color: EVENT_COLORS[0] })
       setShowEventForm(false)
     }
+  }
+
+  const deleteEvent = async (id: string) => {
+    if (!confirm('이 일정을 삭제할까요?')) return
+    await commit({ ...scheduleData, events: scheduleData.events.filter(e => e.id !== id) })
+  }
+
+  const startEditEvent = (event: typeof scheduleData.events[number]) => {
+    setEventEditId(event.id)
+    setEventForm({ startDate: event.date, endDate: event.date, title: event.title, description: event.description, color: event.color })
+    setShowEventForm(true)
+    setShowTodoForm(false)
+    setNotice(null)
   }
 
   const addTodo = async () => {
@@ -136,10 +175,46 @@ export default function Schedule() {
       todos: [...scheduleData.todos, ...nextTodos],
     }
 
+    if (todoEditId) {
+      const next: ScheduleData = {
+        ...scheduleData,
+        todos: scheduleData.todos.map(t => t.id === todoEditId ? {
+          ...t,
+          date: start,
+          content,
+          done: todoForm.done,
+        } : t),
+      }
+      if (await commit(next)) {
+        setTodoForm({ startDate: selected, endDate: selected, content: '', done: false })
+        setTodoEditId(null)
+        setShowTodoForm(false)
+      }
+      return
+    }
+
+    const next: ScheduleData = {
+      ...scheduleData,
+      todos: [...scheduleData.todos, ...nextTodos],
+    }
+
     if (await commit(next)) {
       setTodoForm({ startDate: selected, endDate: selected, content: '', done: false })
       setShowTodoForm(false)
     }
+  }
+
+  const deleteTodo = async (id: string) => {
+    if (!confirm('이 투두를 삭제할까요?')) return
+    await commit({ ...scheduleData, todos: scheduleData.todos.filter(t => t.id !== id) })
+  }
+
+  const startEditTodo = (todo: typeof scheduleData.todos[number]) => {
+    setTodoEditId(todo.id)
+    setTodoForm({ startDate: todo.date, endDate: todo.date, content: todo.content, done: todo.done })
+    setShowTodoForm(true)
+    setShowEventForm(false)
+    setNotice(null)
   }
 
   return (
@@ -183,9 +258,13 @@ export default function Schedule() {
           <select value={eventForm.color} onChange={e => setEventForm({ ...eventForm, color: e.target.value })} style={{ background: 'var(--bg3)', border: '1px solid var(--bd)', color: 'var(--tx)', padding: '8px 10px' }}>
             {EVENT_COLORS.map(color => <option key={color} value={color} style={{ color: 'var(--bg)' }}>{color}</option>)}
           </select>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            <button onClick={() => setShowEventForm(false)} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
-            <button onClick={addEvent} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>{saving ? 'COMMITTING...' : './SAVE'}</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+            {eventEditId ? (
+              <button onClick={() => { setEventEditId(null); setShowEventForm(false); setEventForm({ startDate: selected, endDate: selected, title: '', description: '', color: EVENT_COLORS[0] }) }} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL EDIT</button>
+            ) : (
+              <button onClick={() => setShowEventForm(false)} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
+            )}
+            <button onClick={addEvent} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>{saving ? 'COMMITTING...' : eventEditId ? './UPDATE' : './SAVE'}</button>
           </div>
         </div>
       )}
@@ -208,9 +287,13 @@ export default function Schedule() {
             <input type="checkbox" checked={todoForm.done} onChange={e => setTodoForm({ ...todoForm, done: e.target.checked })} />
             완료됨
           </label>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            <button onClick={() => setShowTodoForm(false)} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
-            <button onClick={addTodo} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>{saving ? 'COMMITTING...' : './SAVE'}</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+            {todoEditId ? (
+              <button onClick={() => { setTodoEditId(null); setShowTodoForm(false); setTodoForm({ startDate: selected, endDate: selected, content: '', done: false }) }} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL EDIT</button>
+            ) : (
+              <button onClick={() => setShowTodoForm(false)} className="btn-secondary" style={{ fontSize: '12px' }}>CANCEL</button>
+            )}
+            <button onClick={addTodo} disabled={saving} className="btn-primary" style={{ fontSize: '12px' }}>{saving ? 'COMMITTING...' : todoEditId ? './UPDATE' : './SAVE'}</button>
           </div>
         </div>
       )}
@@ -281,7 +364,15 @@ export default function Schedule() {
             )}
             {selectedEvents.map(e => (
               <div key={e.id} style={{ borderLeft: `2px solid ${e.color}`, paddingLeft: '10px', marginBottom: '8px' }}>
-                <div style={{ fontSize: '14px', color: 'var(--txw)', fontWeight: 700 }}>{e.title}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: '14px', color: 'var(--txw)', fontWeight: 700 }}>{e.title}</div>
+                  {isAdmin && (
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button onClick={() => startEditEvent(e)} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '2px 8px', fontFamily: 'inherit' }}>EDIT</button>
+                      <button onClick={() => deleteEvent(e.id)} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
+                    </div>
+                  )}
+                </div>
                 {e.description && <div style={{ fontSize: '12px', color: 'var(--tx2)', marginTop: '2px' }}>{e.description}</div>}
               </div>
             ))}
@@ -295,11 +386,19 @@ export default function Schedule() {
               <div style={{ fontSize: '13px', color: 'var(--tx2)' }}>// 투두 없음</div>
             )}
             {selectedTodos.map(t => (
-              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <div style={{ width: '18px', height: '18px', border: `1px solid ${t.done ? 'var(--acc2)' : 'var(--bd)'}`, background: t.done ? 'var(--acc2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {t.done && <span style={{ fontSize: '11px', color: 'var(--bg)', fontWeight: 700 }}>✓</span>}
+              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                  <div style={{ width: '18px', height: '18px', border: `1px solid ${t.done ? 'var(--acc2)' : 'var(--bd)'}`, background: t.done ? 'var(--acc2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {t.done && <span style={{ fontSize: '11px', color: 'var(--bg)', fontWeight: 700 }}>✓</span>}
+                  </div>
+                  <span style={{ fontSize: '14px', color: t.done ? 'var(--tx2)' : 'var(--tx)', textDecoration: t.done ? 'line-through' : 'none', flex: 1, fontFamily: 'sans-serif' }}>{t.content}</span>
                 </div>
-                <span style={{ fontSize: '14px', color: t.done ? 'var(--tx2)' : 'var(--tx)', textDecoration: t.done ? 'line-through' : 'none', flex: 1, fontFamily: 'sans-serif' }}>{t.content}</span>
+                {isAdmin && (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button onClick={() => startEditTodo(t)} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '2px 8px', fontFamily: 'inherit' }}>EDIT</button>
+                    <button onClick={() => deleteTodo(t.id)} style={{ background: 'none', border: 'none', color: 'var(--acc4)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
