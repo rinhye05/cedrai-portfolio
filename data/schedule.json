@@ -118,6 +118,13 @@
       "date": "2026-08-19",
       "description": "친구와 약속",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1786006889311-0",
+      "title": "충주",
+      "date": "2026-08-29",
+      "description": "자취방 내려감",
+      "color": "#b7aefe"
     }
   ],
   "todos": []
