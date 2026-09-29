@@ -146,6 +146,13 @@
       "date": "2026-08-21",
       "description": "잠깐 자취방 가서 청소 + 정리",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709339193-0",
+      "title": "제2회 영남권 사이버 공격 방어 대회",
+      "date": "2026-10-14",
+      "description": "",
+      "color": "#b7aefe"
     }
   ],
   "todos": [
