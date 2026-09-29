@@ -23,6 +23,8 @@ const ABOUT = {
   clubs: [
     { name: 'seKUrity', role: '신입부원', period: '25.03 – 25.08' },
     { name: 'seKUrity', role: '기존부원', period: '25.09 – 현재' },
+    { name: 'seKUrity', role: '홍보', period: '26.09 – 현재' },
+    { name: 'seKUrity', role: '포렌식 스터디장', period: '26.09 – 현재' },
   ],
 }
 
