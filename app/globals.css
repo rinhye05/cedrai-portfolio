@@ -47,6 +47,28 @@ button, input, textarea { font: inherit; }
 .contact-intro p { margin-top: 1.2rem; color: var(--tx2); font: 18px/1.8 var(--font-sans); }
 body::before { content: ''; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(circle at 82% 8%, rgba(115,191,255,.12), transparent 28%), radial-gradient(circle at 10% 72%, rgba(115,224,208,.06), transparent 26%); z-index: -1; }
 [data-theme='light'] { --bg: #f1f6fb; --bg2: #fff; --bg3: #e5eef7; --acc: #1769a8; --acc2: #147f78; --acc3: #416fc0; --acc4: #b44557; --tx: #263b4e; --tx2: #647d93; --txw: #102638; --bd: #cad9e6; }
+[data-theme='light'] .profile-rail { background: rgba(241,246,251,.88); }
+[data-theme='light'] .activities-card,
+[data-theme='light'] .private-files__locked,
+[data-theme='light'] .study-page__empty,
+[data-theme='light'] .competition-details > div,
+[data-theme='light'] .competition-writeup,
+[data-theme='light'] .competition-materials,
+[data-theme='light'] .tistory-post,
+[data-theme='light'] .session-files__section,
+[data-theme='light'] .skill-grid > div,
+[data-theme='light'] .contact-wrap > a > div,
+[data-theme='light'] .blog-category,
+[data-theme='light'] .blog-post-card > div { background: rgba(255,255,255,.88) !important; color: var(--tx) !important; }
+[data-theme='light'] .competition-materials { background: var(--bg3) !important; }
+[data-theme='light'] .competition-writeup summary strong,
+[data-theme='light'] .curriculum-card__title,
+[data-theme='light'] .tistory-post h2,
+[data-theme='light'] .private-file__name,
+[data-theme='light'] .session-file,
+[data-theme='light'] .competition-material,
+[data-theme='light'] .blog-post-card > div > div:first-child { color: var(--txw) !important; }
+[data-theme='light'] .blog-post-card:hover > div { background: #eef6fc !important; }
 .scanlines { position: relative; }
 .scanlines::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0 49.9%, rgba(115,191,255,.035) 50%, transparent 50.1%); pointer-events: none; }
 .glitch { position: relative; display: inline-block; color: var(--txw); text-shadow: 0 0 28px rgba(115,191,255,.18); }
