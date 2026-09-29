@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
         const id = readToken(request.cookies.get(SESSION_COOKIE)?.value)
         if (!process.env.ADMIN_ID || id !== process.env.ADMIN_ID) throw new Error('관리자만 파일을 업로드할 수 있습니다.')
         if (!allowedPath(pathname) || pathname.includes('..')) throw new Error('업로드 경로가 올바르지 않습니다.')
-        return { allowedContentTypes: ['*/*'], addRandomSuffix: false, tokenPayload: JSON.stringify({ adminId: id }) }
+        // 파일 형식은 제한하지 않고, 관리자 인증과 허용된 경로만 검사합니다.
+        return { addRandomSuffix: false, tokenPayload: JSON.stringify({ adminId: id }) }
       },
     })
     return NextResponse.json(jsonResponse)
