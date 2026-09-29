@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 }
 
 import { AuthProvider } from '@/lib/auth-context'
+import ProfileRail from '@/components/ProfileRail'
 
 export default function RootLayout({
   children,
@@ -20,7 +21,10 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hack-font@3/build/web/hack.css" />
       </head>
       <body style={{ fontFamily: "'Hack', 'Courier New', monospace" }}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ProfileRail />
+          <div className="site-content">{children}</div>
+        </AuthProvider>
       </body>
     </html>
   )

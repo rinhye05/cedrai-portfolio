@@ -6,11 +6,12 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
 const links = [
-  { label: 'ABOUT',     href: '/about'     },
+  { label: 'HOME',      href: '/'          },
   { label: 'PROJECTS',  href: '/projects'  },
   { label: 'BLOG',      href: '/blog'      },
   { label: 'SCHEDULE',  href: '/schedule'  },
   { label: 'NOW',       href: '/now'       },
+  { label: 'CONTACT',   href: '/contact'   },
 ]
 
 function ContactLink({ onClick }: { onClick?: () => void }) {
@@ -47,7 +48,7 @@ export default function Nav() {
     }
     return true
   })
-  const { isAdmin, login, logout } = useAuth()
+  const { isAdmin, isMember, login, logout } = useAuth()
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
@@ -80,12 +81,11 @@ export default function Nav() {
         {/* 데스크탑 링크 */}
         <div className="nav-desktop" style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           {links.map((l) => (
-            <Link key={l.label} href={l.href} style={{ color: 'var(--tx2)', fontSize: '12px', textDecoration: 'none', letterSpacing: '.08em', transition: 'color .2s' }}
+            <Link key={l.label} href={l.href} onClick={() => { if (l.href === '/') sessionStorage.setItem('visited_at', String(Date.now())) }} style={{ color: 'var(--tx2)', fontSize: '12px', textDecoration: 'none', letterSpacing: '.08em', transition: 'color .2s' }}
               onMouseEnter={(e) => ((e.target as HTMLElement).style.color = 'var(--acc)')}
               onMouseLeave={(e) => ((e.target as HTMLElement).style.color = 'var(--tx2)')}
             >{l.label}</Link>
           ))}
-          <ContactLink />
         </div>
 
         {/* 오른쪽 영역 */}
@@ -103,9 +103,9 @@ export default function Nav() {
           </button>
 
           {/* 로그인/어드민 */}
-          {isAdmin ? (
+          {isAdmin || isMember ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.08em' }}>ADMIN</span>
+              <span style={{ fontSize: '11px', color: 'var(--acc2)', letterSpacing: '.08em' }}>{isAdmin ? 'ADMIN' : 'MEMBER'}</span>
               <button onClick={logout} style={{ background: 'none', border: '1px solid var(--bd)', color: 'var(--tx2)', cursor: 'pointer', fontSize: '11px', padding: '3px 8px', fontFamily: 'inherit' }}>LOGOUT</button>
             </div>
           ) : (
@@ -138,11 +138,10 @@ export default function Nav() {
       {menuOpen && (
         <div className="nav-mobile" style={{ position: 'fixed', top: '48px', left: 0, right: 0, zIndex: 99, background: 'var(--bg2)', borderBottom: '1px solid var(--bd)', display: 'flex', flexDirection: 'column' }}>
           {links.map((l) => (
-            <Link key={l.label} href={l.href} onClick={() => setMenuOpen(false)}
+            <Link key={l.label} href={l.href} onClick={() => { setMenuOpen(false); if (l.href === '/') sessionStorage.setItem('visited_at', String(Date.now())) }}
               style={{ padding: '14px 1.2rem', color: 'var(--tx2)', fontSize: '14px', textDecoration: 'none', letterSpacing: '.10em', borderBottom: '1px solid var(--bd)' }}
             >{l.label}</Link>
           ))}
-          <ContactLink onClick={() => setMenuOpen(false)} />
         </div>
       )}
 

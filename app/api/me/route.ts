@@ -8,5 +8,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ id: null })
   }
   const id = readToken(request.cookies.get(SESSION_COOKIE)?.value)
-  return NextResponse.json({ id })
+  const role = id && id === process.env.CLUB_ID ? 'club-member' : id ? 'admin' : null
+  return NextResponse.json({ id, role })
 }

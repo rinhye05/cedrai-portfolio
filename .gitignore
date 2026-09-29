@@ -29,6 +29,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# private club uploads
+/.private_uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

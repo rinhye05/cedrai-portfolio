@@ -6,7 +6,7 @@ const LINKS = [
   { icon: '@',  label: 'EMAIL',  value: 'flsrin715@gmail.com',  href: 'mailto:flsrin715@gmail.com'    },
 ]
 
-export default function Contact() {
+export default function Contact({ fullPage = false }: { fullPage?: boolean }) {
   return (
     <section id="contact" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.2rem' }}>
@@ -17,6 +17,12 @@ export default function Contact() {
         <div style={{ fontSize: '12px', color: 'var(--tx2)', letterSpacing: '.1em' }}>SYS://CONTACT</div>
       </div>
 
+      {fullPage && (
+        <div className="contact-intro">
+          <h1>Let&apos;s connect<span>.</span></h1>
+          <p>궁금한 점이나 함께 해보고 싶은 프로젝트가 있다면 편하게 연락해주세요.</p>
+        </div>
+      )}
       <div className="contact-wrap" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
         {LINKS.map((l) => (
           <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
