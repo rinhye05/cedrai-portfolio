@@ -172,6 +172,12 @@
       "date": "2026-10-01",
       "content": "메모리 해킹을 위한 기본 도구2: pwntools",
       "done": false
+    },
+    {
+      "id": "todo-1790703897962-0",
+      "date": "2026-10-02",
+      "content": "메모리 해킹을 위한 기본 도구3:hexdump, odjdump, strace, Itrace",
+      "done": false
     }
   ]
 }
