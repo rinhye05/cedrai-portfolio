@@ -188,6 +188,13 @@
       "date": "2026-10-23",
       "description": "",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709427409-0",
+      "title": "충청권 사이버 보안 경진 대회",
+      "date": "2026-10-29",
+      "description": "",
+      "color": "#b7aefe"
     }
   ],
   "todos": [
