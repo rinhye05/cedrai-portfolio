@@ -5,7 +5,7 @@ import { readToken, SESSION_COOKIE } from '@/lib/session'
 export const runtime = 'nodejs'
 
 function allowedPath(pathname: string) {
-  return /^(?:ku-ctf\/(?:directory|xss)|sekurity-rookie|forensic-study\/session-(?:0[1-9]|10)\/(?:reports|practice))\/[^/\\]+$/.test(pathname)
+  return /^(?:ku-ctf\/(?:directory|xss)|msg-ctf\/pokemon-web-challenge|sekurity-rookie|forensic-study\/session-(?:0[1-9]|10)\/(?:reports|practice))\/[^/\\]+$/.test(pathname)
 }
 
 export async function POST(request: NextRequest) {

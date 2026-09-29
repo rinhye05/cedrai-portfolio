@@ -8,6 +8,7 @@ const COMPETITIONS: Record<string, { title: string; year: string; status: string
   'msg-ctf': {
     title: 'MSG CTF', year: '2025', status: 'STAFF / PROBLEM SETTER',
     intro: '문제를 직접 출제하는 운영진으로 참여했습니다.',
+    writeups: [{ category: 'WEB HACKING', title: 'Pokémon Web Challenge' }],
   },
   'ku-ctf': {
     title: 'KU CTF', year: '2025', status: 'PROBLEM SETTER',
@@ -61,7 +62,7 @@ export default async function CompetitionPage({ params }: { params: Promise<{ sl
           {competition.writeups.map((writeup, index) => <details key={writeup.title} className="competition-writeup">
             <summary><i>{String(index + 1).padStart(2, '0')}</i><strong>{writeup.title}</strong><span>{writeup.category}</span><b>＋</b></summary>
             <div className="competition-writeup__body">
-              {notionPosts[index] ? <div className="notion-post__content" dangerouslySetInnerHTML={{ __html: notionPosts[index]!.contentHtml }} /> : writeup.href ? <a href={writeup.href} target="_blank" rel="noopener noreferrer">원문 열기 ↗</a> : <><div className="competition-writeup__placeholder">// 문제 출제 자료는 준비 중입니다.</div>{slug === 'ku-ctf' && <CompetitionMaterials problem={writeup.title.toLowerCase() as 'directory' | 'xss'} />}</>}
+              {notionPosts[index] ? <div className="notion-post__content" dangerouslySetInnerHTML={{ __html: notionPosts[index]!.contentHtml }} /> : writeup.href ? <a href={writeup.href} target="_blank" rel="noopener noreferrer">원문 열기 ↗</a> : <><div className="competition-writeup__placeholder">// 문제 출제 자료는 준비 중입니다.</div>{slug === 'ku-ctf' && <CompetitionMaterials competition="ku-ctf" problem={writeup.title.toLowerCase() as 'directory' | 'xss'} />}{slug === 'msg-ctf' && <CompetitionMaterials competition="msg-ctf" problem="pokemon-web-challenge" />}</>}
             </div>
           </details>)}
         </div>}

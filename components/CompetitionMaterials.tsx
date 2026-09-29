@@ -13,14 +13,14 @@ function formatSize(size: number) {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export default function CompetitionMaterials({ problem }: { problem: 'directory' | 'xss' }) {
+export default function CompetitionMaterials({ competition = 'ku-ctf', problem }: { competition?: 'ku-ctf' | 'msg-ctf'; problem: 'directory' | 'xss' | 'pokemon-web-challenge' }) {
   const { isAdmin, isMember, ready } = useAuth()
   const [files, setFiles] = useState<FileItem[]>([])
   const [storage, setStorage] = useState<'blob' | 'local'>('local')
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState('')
   const load = async () => {
-    const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}`)
+    const res = await fetch(`/api/activities/competitions/${competition}/${problem}`)
     if (res.ok) { const data = await res.json(); setFiles(data.files ?? []); setStorage(data.storage ?? 'local') }
   }
   useEffect(() => { load() }, [problem])
@@ -34,12 +34,12 @@ export default function CompetitionMaterials({ problem }: { problem: 'directory'
     if (storage === 'blob') {
       try {
         const uploaded: string[] = []
-        for (const file of selected) { const name = safeFileName(file.name); await uploadBlob(`ku-ctf/${problem}/${name}`, file, { access: 'private', handleUploadUrl: '/api/uploads/client' }); uploaded.push(name) }
+        for (const file of selected) { const name = safeFileName(file.name); await uploadBlob(`${competition}/${problem}/${name}`, file, { access: 'private', handleUploadUrl: '/api/uploads/client' }); uploaded.push(name) }
         data = { uploaded }
       } catch (error) { data = { error: error instanceof Error ? error.message : '업로드에 실패했어요.' } }
     } else {
       const body = new FormData(); selected.forEach((file) => body.append('file', file))
-      const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}`, { method: 'POST', body })
+      const res = await fetch(`/api/activities/competitions/${competition}/${problem}`, { method: 'POST', body })
       data = await res.json().catch(() => ({}))
       if (!res.ok) data.error ??= '업로드에 실패했어요.'
     }
@@ -51,7 +51,7 @@ export default function CompetitionMaterials({ problem }: { problem: 'directory'
   }
   const remove = async (name: string) => {
     if (!window.confirm(`'${name}' 파일을 삭제할까요?`)) return
-    const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}/${encodeURIComponent(name)}`, { method: 'DELETE' })
+    const res = await fetch(`/api/activities/competitions/${competition}/${problem}/${encodeURIComponent(name)}`, { method: 'DELETE' })
     const data = await res.json().catch(() => ({}))
     setMessage(res.ok ? `${name} 파일을 삭제했어요.` : (data.error ?? '삭제에 실패했어요.'))
     if (res.ok) load()
