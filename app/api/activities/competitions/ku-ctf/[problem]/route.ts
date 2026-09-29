@@ -3,13 +3,13 @@ import path from 'path'
 import { NextResponse, type NextRequest } from 'next/server'
 import { readToken, SESSION_COOKIE } from '@/lib/session'
 import { blobStorageEnabled, listPrivateFiles, uploadPrivateFile } from '@/lib/blob-storage'
+import { safeFileName } from '@/lib/file-name'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const baseDir = path.join(process.cwd(), '.private_uploads', 'ku-ctf')
 const validProblem = (value: string) => value === 'directory' || value === 'xss'
-const safeName = (value: string) => value.replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
 const isAdmin = (request: NextRequest) => Boolean(process.env.ADMIN_SESSION_SECRET && readToken(request.cookies.get(SESSION_COOKIE)?.value) === process.env.ADMIN_ID)
 
 export async function GET(_request: NextRequest, context: { params: Promise<{ problem: string }> }) {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ pr
     const uploaded: string[] = []
     const skipped: string[] = []
     for (const file of files) {
-      const name = safeName(file.name)
+      const name = safeFileName(file.name)
       if (!name || existing.has(name)) { skipped.push(name || file.name); continue }
       try { await uploadPrivateFile(`${prefix}${name}`, file); uploaded.push(name) }
       catch { return NextResponse.json({ error: `${name} 업로드 중 서버 오류가 발생했어요.` }, { status: 500 }) }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ pr
   const uploaded: string[] = []
   const skipped: string[] = []
   for (const file of files) {
-    const name = safeName(file.name)
+    const name = safeFileName(file.name)
     if (!name) { skipped.push(file.name); continue }
     try {
       await writeFile(path.join(dir, name), Buffer.from(await file.arrayBuffer()), { flag: 'wx' })

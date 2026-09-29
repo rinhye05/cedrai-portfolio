@@ -3,6 +3,7 @@ import path from 'path'
 import { NextResponse, type NextRequest } from 'next/server'
 import { readToken, SESSION_COOKIE } from '@/lib/session'
 import { blobStorageEnabled, getPrivateFile } from '@/lib/blob-storage'
+import { safeFileName } from '@/lib/file-name'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ nam
     return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
   }
   const { name } = await context.params
-  const safeName = decodeURIComponent(name).replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
+  const safeName = safeFileName(decodeURIComponent(name))
   if (!safeName) return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
   if (blobStorageEnabled()) {
     const result = await getPrivateFile(`sekurity-rookie/${safeName}`)

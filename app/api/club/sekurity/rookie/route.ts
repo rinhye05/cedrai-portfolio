@@ -3,6 +3,7 @@ import path from 'path'
 import { NextResponse, type NextRequest } from 'next/server'
 import { readToken, SESSION_COOKIE } from '@/lib/session'
 import { blobStorageEnabled, listPrivateFiles, uploadPrivateFile } from '@/lib/blob-storage'
+import { safeFileName } from '@/lib/file-name'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     const uploaded: string[] = []
     const skipped: string[] = []
     for (const file of files) {
-      const name = file.name.replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
+      const name = safeFileName(file.name)
       if (!name || existing.has(name)) { skipped.push(name || file.name); continue }
       try { await uploadPrivateFile(`${prefix}${name}`, file); uploaded.push(name) }
       catch { return NextResponse.json({ error: `${name} 업로드 중 서버 오류가 발생했어요.` }, { status: 500 }) }
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
   const uploaded: string[] = []
   const skipped: string[] = []
   for (const file of files) {
-    const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
+    const safeName = safeFileName(file.name)
     if (!safeName) {
       skipped.push(file.name)
       continue
