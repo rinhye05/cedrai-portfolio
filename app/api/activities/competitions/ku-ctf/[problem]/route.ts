@@ -17,7 +17,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ pr
   if (!validProblem(problem)) return NextResponse.json({ error: '문제를 찾을 수 없습니다.' }, { status: 404 })
   if (blobStorageEnabled()) {
     const files = await listPrivateFiles(`ku-ctf/${problem}/`)
-    return NextResponse.json({ files: files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)) })
+    return NextResponse.json({ files: files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)), storage: 'blob' })
   }
   const dir = path.join(baseDir, problem)
   await mkdir(dir, { recursive: true })
@@ -26,7 +26,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ pr
     const info = await stat(path.join(dir, name))
     return { name, size: info.size, uploadedAt: info.mtime.toISOString() }
   }))
-  return NextResponse.json({ files: files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)) })
+  return NextResponse.json({ files: files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)), storage: 'local' })
 }
 
 export async function POST(request: NextRequest, context: { params: Promise<{ problem: string }> }) {

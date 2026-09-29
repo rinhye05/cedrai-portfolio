@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { upload as uploadBlob } from '@vercel/blob/client'
 import { useAuth } from '@/lib/auth-context'
+import { safeFileName } from '@/lib/file-name'
 
 type FileItem = { name: string; size: number; uploadedAt: string }
 
@@ -14,11 +16,12 @@ function formatSize(size: number) {
 export default function CompetitionMaterials({ problem }: { problem: 'directory' | 'xss' }) {
   const { isAdmin, isMember, ready } = useAuth()
   const [files, setFiles] = useState<FileItem[]>([])
+  const [storage, setStorage] = useState<'blob' | 'local'>('local')
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState('')
   const load = async () => {
     const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}`)
-    if (res.ok) setFiles((await res.json()).files ?? [])
+    if (res.ok) { const data = await res.json(); setFiles(data.files ?? []); setStorage(data.storage ?? 'local') }
   }
   useEffect(() => { load() }, [problem])
   const upload = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -27,11 +30,21 @@ export default function CompetitionMaterials({ problem }: { problem: 'directory'
     const selected = Array.from(input.files ?? [])
     if (!selected.length) { setMessage('업로드할 파일을 선택해주세요.'); return }
     setUploading(true); setMessage('')
-    const body = new FormData(); selected.forEach((file) => body.append('file', file))
-    const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}`, { method: 'POST', body })
-    const data = await res.json().catch(() => ({}))
+    let data: { uploaded?: string[]; skipped?: string[]; error?: string } = {}
+    if (storage === 'blob') {
+      try {
+        const uploaded: string[] = []
+        for (const file of selected) { const name = safeFileName(file.name); await uploadBlob(`ku-ctf/${problem}/${name}`, file, { access: 'private', handleUploadUrl: '/api/uploads/client' }); uploaded.push(name) }
+        data = { uploaded }
+      } catch (error) { data = { error: error instanceof Error ? error.message : '업로드에 실패했어요.' } }
+    } else {
+      const body = new FormData(); selected.forEach((file) => body.append('file', file))
+      const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}`, { method: 'POST', body })
+      data = await res.json().catch(() => ({}))
+      if (!res.ok) data.error ??= '업로드에 실패했어요.'
+    }
     setUploading(false)
-    if (!res.ok) { setMessage(data.error ?? '업로드에 실패했어요.'); return }
+    if (data.error) { setMessage(data.error); return }
     input.form?.reset()
     setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.`)
     load()

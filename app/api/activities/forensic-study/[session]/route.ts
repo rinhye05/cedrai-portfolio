@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ se
   if (blobStorageEnabled()) {
     const result: Record<string, unknown[]> = { reports: [], practice: [] }
     for (const kind of ['reports', 'practice'] as const) result[kind] = await listPrivateFiles(`forensic-study/${session}/${kind}/`)
-    return NextResponse.json(result)
+    return NextResponse.json({ ...result, storage: 'blob' })
   }
   const result: Record<string, unknown[]> = { reports: [], practice: [] }
   for (const kind of ['reports', 'practice'] as const) {
@@ -35,7 +35,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ se
       return { name, size: info.size, uploadedAt: info.mtime.toISOString() }
     }))
   }
-  return NextResponse.json(result)
+  return NextResponse.json({ ...result, storage: 'local' })
 }
 
 export async function POST(request: NextRequest, context: { params: Promise<{ session: string }> }) {

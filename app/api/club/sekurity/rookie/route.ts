@@ -16,14 +16,14 @@ function sessionId(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  if (blobStorageEnabled()) return NextResponse.json({ files: (await listPrivateFiles('sekurity-rookie/')).sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)) })
+  if (blobStorageEnabled()) return NextResponse.json({ files: (await listPrivateFiles('sekurity-rookie/')).sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)), storage: 'blob' })
   await mkdir(uploadDir, { recursive: true })
   const names = await readdir(uploadDir)
   const files = await Promise.all(names.map(async (name) => {
     const info = await stat(path.join(uploadDir, name))
     return { name, size: info.size, uploadedAt: info.mtime.toISOString() }
   }))
-  return NextResponse.json({ files: files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)) })
+  return NextResponse.json({ files: files.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)), storage: 'local' })
 }
 
 export async function POST(request: NextRequest) {

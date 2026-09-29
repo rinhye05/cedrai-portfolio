@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { upload as uploadBlob } from '@vercel/blob/client'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/lib/auth-context'
+import { safeFileName } from '@/lib/file-name'
 
 type Session = { title: string; tools?: string; learning?: string[]; assignments: string[] }
 type PrivateFile = { name: string; size: number; uploadedAt: string }
@@ -35,12 +37,14 @@ export default function ForensicStudyPage() {
   const [files, setFiles] = useState<Record<string, SessionFiles>>({})
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState('')
+  const [storage, setStorage] = useState<'blob' | 'local'>('local')
 
   const loadFiles = async (sessionId: string) => {
     const res = await fetch(`/api/activities/forensic-study/${sessionId}`)
     if (res.ok) {
       const data = await res.json()
       setFiles((current) => ({ ...current, [sessionId]: data }))
+      setStorage(data.storage ?? 'local')
     }
   }
   useEffect(() => { loadFiles('session-01') }, [])
@@ -51,12 +55,21 @@ export default function ForensicStudyPage() {
     const files = Array.from(input.files ?? [])
     if (files.length === 0) return setMessage('업로드할 파일을 선택해주세요.')
     setUploading(true); setMessage('')
-    const body = new FormData(); files.forEach((file) => body.append('file', file))
-    body.append('kind', kind)
-    const res = await fetch(`/api/activities/forensic-study/${sessionId}`, { method: 'POST', body })
-    const data = await res.json().catch(() => ({}))
+    let data: { uploaded?: string[]; skipped?: string[]; error?: string } = {}
+    if (storage === 'blob') {
+      try {
+        const uploaded: string[] = []
+        for (const file of files) { const name = safeFileName(file.name); await uploadBlob(`forensic-study/${sessionId}/${kind}/${name}`, file, { access: 'private', handleUploadUrl: '/api/uploads/client' }); uploaded.push(name) }
+        data = { uploaded }
+      } catch (error) { data = { error: error instanceof Error ? error.message : '업로드에 실패했어요.' } }
+    } else {
+      const body = new FormData(); files.forEach((file) => body.append('file', file)); body.append('kind', kind)
+      const res = await fetch(`/api/activities/forensic-study/${sessionId}`, { method: 'POST', body })
+      data = await res.json().catch(() => ({}))
+      if (!res.ok) data.error ??= '업로드에 실패했어요.'
+    }
     setUploading(false)
-    if (!res.ok) return setMessage(data.error ?? '업로드에 실패했어요.')
+    if (data.error) return setMessage(data.error)
     event.currentTarget.reset()
     const skipped = Array.isArray(data.skipped) && data.skipped.length > 0 ? ` (중복/제외: ${data.skipped.join(', ')})` : ''
     setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.${skipped}`); loadFiles(sessionId)
