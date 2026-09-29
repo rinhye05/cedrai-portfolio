@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 
 export default function AboutPage() {
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <About />
       <Footer />

@@ -48,16 +48,18 @@ export default function ForensicStudyPage() {
   const upload = async (event: React.FormEvent<HTMLFormElement>, sessionId: string, kind: 'reports' | 'practice') => {
     event.preventDefault()
     const input = event.currentTarget.elements.namedItem('file') as HTMLInputElement
-    const file = input.files?.[0]
-    if (!file) return setMessage('업로드할 파일을 선택해주세요.')
+    const files = Array.from(input.files ?? [])
+    if (files.length === 0) return setMessage('업로드할 파일을 선택해주세요.')
     setUploading(true); setMessage('')
-    const body = new FormData(); body.append('file', file)
+    const body = new FormData(); files.forEach((file) => body.append('file', file))
     body.append('kind', kind)
     const res = await fetch(`/api/activities/forensic-study/${sessionId}`, { method: 'POST', body })
     const data = await res.json().catch(() => ({}))
     setUploading(false)
     if (!res.ok) return setMessage(data.error ?? '업로드에 실패했어요.')
-    event.currentTarget.reset(); setMessage('파일을 업로드했어요.'); loadFiles(sessionId)
+    event.currentTarget.reset()
+    const skipped = Array.isArray(data.skipped) && data.skipped.length > 0 ? ` (중복/제외: ${data.skipped.join(', ')})` : ''
+    setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.${skipped}`); loadFiles(sessionId)
   }
 
   const toggleSession = (index: number) => {
@@ -70,13 +72,13 @@ export default function ForensicStudyPage() {
     const list = files[sessionId]?.[kind] ?? []
     return <div className="session-files__section">
       <div className="session-files__title">{label}</div>
-      {isAdmin && <form onSubmit={(event) => upload(event, sessionId, kind)} className="session-files__upload"><input name="file" type="file" aria-label={`${label} 업로드`} /><button className="btn-secondary" disabled={uploading}>{uploading ? '...' : 'UPLOAD'}</button></form>}
+      {isAdmin && <form onSubmit={(event) => upload(event, sessionId, kind)} className="session-files__upload"><input name="file" type="file" multiple accept=".zip,.7z,.rar,.pdf,.doc,.docx,.txt,.md,.raw,.pcap,.e01,.dd,.img" aria-label={`${label} 업로드`} /><button className="btn-secondary" disabled={uploading}>{uploading ? '...' : 'UPLOAD FILES'}</button></form>}
       <div className="session-files__list">{list.length === 0 ? <span className="session-files__empty">// 준비된 파일 없음</span> : list.map((file) => canDownload ? <a key={file.name} href={`/api/activities/forensic-study/${sessionId}/${encodeURIComponent(file.name)}?kind=${kind}`} className="session-file">↘ {file.name}<small>{formatSize(file.size)}</small></a> : <span key={file.name} className="session-file session-file--locked">⌁ {file.name}<small>LOGIN REQUIRED</small></span>)}</div>
     </div>
   }
 
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <section className="study-page">
         <div className="study-page__head"><div className="sec-tag sec-tag-red">SECURITY STUDY / FORENSICS</div><div className="study-page__path">STUDY://FORENSICS</div></div>

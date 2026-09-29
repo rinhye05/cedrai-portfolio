@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <>
       {!loaded && <LoadingScreen onDone={handleDone} />}
-      <main style={{ opacity: loaded ? 1 : 0, transition: 'opacity .4s ease' }}>
+      <main className="page-main" style={{ opacity: loaded ? 1 : 0, transition: 'opacity .4s ease' }}>
         <Nav />
         <ScrollReveal><Hero /></ScrollReveal>
         <ScrollReveal delay={50}><Activities /></ScrollReveal>

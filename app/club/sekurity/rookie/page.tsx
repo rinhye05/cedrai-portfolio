@@ -32,19 +32,21 @@ export default function RookiePage() {
   const upload = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const input = event.currentTarget.elements.namedItem('file') as HTMLInputElement
-    const file = input.files?.[0]
-    if (!file) return setMessage('업로드할 파일을 선택해주세요.')
+    const files = Array.from(input.files ?? [])
+    if (files.length === 0) return setMessage('업로드할 파일을 선택해주세요.')
     setUploading(true); setMessage('')
-    const body = new FormData(); body.append('file', file)
+    const body = new FormData(); files.forEach((file) => body.append('file', file))
     const res = await fetch('/api/club/sekurity/rookie', { method: 'POST', body })
     const data = await res.json().catch(() => ({}))
     setUploading(false)
     if (!res.ok) return setMessage(data.error ?? '업로드에 실패했어요.')
-    event.currentTarget.reset(); setMessage('파일을 업로드했어요.'); loadFiles()
+    event.currentTarget.reset()
+    const skipped = Array.isArray(data.skipped) && data.skipped.length > 0 ? ` (중복/제외: ${data.skipped.join(', ')})` : ''
+    setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.${skipped}`); loadFiles()
   }
 
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <section className="private-club-page">
         <div className="private-club-page__head">
@@ -59,8 +61,8 @@ export default function RookiePage() {
             <div className="private-files__toolbar">
               <div><strong>{files.length}</strong> FILES AVAILABLE</div>
               {isAdmin && <form onSubmit={upload} className="private-files__upload">
-                <input name="file" type="file" aria-label="업로드할 파일" />
-                <button className="btn-primary" disabled={uploading}>{uploading ? 'UPLOADING...' : 'UPLOAD FILE'}</button>
+                <input name="file" type="file" multiple aria-label="업로드할 파일" />
+                <button className="btn-primary" disabled={uploading}>{uploading ? 'UPLOADING...' : 'UPLOAD FILES'}</button>
               </form>}
             </div>
             {message && <div className="private-files__message">{message}</div>}

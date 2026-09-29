@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 
 export default function ContactPage() {
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <Contact fullPage />
       <Footer />

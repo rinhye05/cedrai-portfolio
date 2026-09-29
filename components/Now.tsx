@@ -45,7 +45,7 @@ export default function Now() {
   }
 
   return (
-    <section style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto' }}>
+    <section className="now-page-section" style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto' }}>
       <div className="sec-head" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
         <div className="sec-tag">NOW</div>
         <div className="sec-rule" style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>

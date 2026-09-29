@@ -6,7 +6,7 @@ import Footer from '@/components/Footer'
 
 export default function NowPage() {
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <Now />
       <Footer />

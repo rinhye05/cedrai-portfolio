@@ -9,7 +9,7 @@ const BLOG_URL = 'https://rinhye05.tistory.com'
 const POSTS_PER_CATEGORY = 3
 
 // 대분류는 티스토리에서 그때그때 읽어오므로, 색은 이름 기준으로 고정 배정합니다.
-const PALETTE = ['var(--acc2)', '#ff6b35', '#ff9500', '#22c55e', '#a855f7', '#00f5d4', '#b7aefe', '#ffd166']
+const PALETTE = ['var(--acc)', 'var(--acc2)', 'var(--acc3)', '#8ed8ff', '#64c7d8', '#9bbcff']
 
 function colorFor(name: string) {
   let h = 0
@@ -28,7 +28,7 @@ export default function Blog() {
   }, [])
 
   if (categories === null) return (
-    <section id="blog" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
+    <section id="blog" className="blog-section" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
         <div className="sec-tag">INTEL LOG</div>
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)' }} />
@@ -47,7 +47,7 @@ export default function Blog() {
   )
 
   return (
-    <section id="blog" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
+    <section id="blog" className="blog-section" style={{ padding: '2rem', borderBottom: '1px solid var(--bd)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
         <div className="sec-tag">INTEL LOG</div>
         <div style={{ flex: 1, height: '1px', background: 'var(--bd)', position: 'relative' }}>
@@ -66,7 +66,7 @@ export default function Blog() {
         {categories.map((c) => {
           const color = colorFor(c.name)
           return (
-            <div key={c.path}>
+            <div key={c.path} className="blog-category">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
                 <div style={{ width: '3px', height: '16px', background: color, flexShrink: 0 }} />
                 <a href={`${BLOG_URL}${c.path}`} target="_blank" rel="noopener noreferrer"
@@ -81,7 +81,7 @@ export default function Blog() {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '7px' }}>
                 {c.posts.slice(0, POSTS_PER_CATEGORY).map((p) => (
-                  <a key={p.id} href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                  <a key={p.id} className="blog-post-card" href={p.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                     <div
                       style={{
                         background: 'var(--bg2)',

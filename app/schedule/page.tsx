@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 
 export default function SchedulePage() {
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <Schedule />
       <Footer />

@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 
 export default function BlogPage() {
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <Blog />
       <Footer />

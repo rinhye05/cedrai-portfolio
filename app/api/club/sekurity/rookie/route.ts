@@ -26,16 +26,26 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   if (sessionId(request) !== process.env.ADMIN_ID) return NextResponse.json({ error: '관리자만 파일을 업로드할 수 있습니다.' }, { status: 403 })
   const form = await request.formData()
-  const file = form.get('file')
-  if (!(file instanceof File) || !file.name) return NextResponse.json({ error: '파일을 선택해주세요.' }, { status: 400 })
-  if (file.size > 25 * 1024 * 1024) return NextResponse.json({ error: '파일은 25MB 이하만 업로드할 수 있어요.' }, { status: 413 })
-
-  const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
-  if (!safeName) return NextResponse.json({ error: '사용할 수 없는 파일명입니다.' }, { status: 400 })
+  const files = form.getAll('file').filter((entry): entry is File => entry instanceof File && Boolean(entry.name))
+  if (files.length === 0) return NextResponse.json({ error: '파일을 선택해주세요.' }, { status: 400 })
+  if (files.some((file) => file.size > 25 * 1024 * 1024)) return NextResponse.json({ error: '파일 하나당 25MB 이하만 업로드할 수 있어요.' }, { status: 413 })
+  if (files.reduce((total, file) => total + file.size, 0) > 100 * 1024 * 1024) return NextResponse.json({ error: '한 번에 최대 100MB까지 업로드할 수 있어요.' }, { status: 413 })
   await mkdir(uploadDir, { recursive: true })
-  await writeFile(path.join(uploadDir, safeName), Buffer.from(await file.arrayBuffer()), { flag: 'wx' }).catch((error: NodeJS.ErrnoException) => {
-    if (error.code === 'EEXIST') throw new Error('같은 이름의 파일이 이미 있습니다.')
-    throw error
-  })
-  return NextResponse.json({ ok: true, name: safeName })
+  const uploaded: string[] = []
+  const skipped: string[] = []
+  for (const file of files) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
+    if (!safeName) {
+      skipped.push(file.name)
+      continue
+    }
+    try {
+      await writeFile(path.join(uploadDir, safeName), Buffer.from(await file.arrayBuffer()), { flag: 'wx' })
+      uploaded.push(safeName)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'EEXIST') skipped.push(safeName)
+      else return NextResponse.json({ error: `${safeName} 업로드 중 서버 오류가 발생했어요.` }, { status: 500 })
+    }
+  }
+  return NextResponse.json({ ok: uploaded.length > 0, uploaded, skipped })
 }

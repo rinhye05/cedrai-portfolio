@@ -2,15 +2,20 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import { getTistoryPost } from '@/lib/tistory'
 import { getNotionPost } from '@/lib/notion'
+import CompetitionMaterials from '@/components/CompetitionMaterials'
 
-const COMPETITIONS: Record<string, { title: string; year: string; status: string; intro: string; writeups?: { category: string; title: string; href: string; notionId?: string }[] }> = {
+const COMPETITIONS: Record<string, { title: string; year: string; status: string; intro: string; writeups?: { category: string; title: string; href?: string; notionId?: string }[] }> = {
   'msg-ctf': {
     title: 'MSG CTF', year: '2025', status: 'STAFF / PROBLEM SETTER',
     intro: '문제를 직접 출제하는 운영진으로 참여했습니다.',
   },
   'ku-ctf': {
-    title: 'KU CTF', year: '2025', status: 'PARTICIPANT',
-    intro: '2025 KU CTF 참여 기록을 정리하는 공간입니다.',
+    title: 'KU CTF', year: '2025', status: 'PROBLEM SETTER',
+    intro: '2025 KU CTF에서 문제 출제자로 참여했습니다.',
+    writeups: [
+      { category: 'WEB HACKING', title: 'Directory' },
+      { category: 'WEB HACKING', title: 'XSS' },
+    ],
   },
   hacktheon: {
     title: '핵테온', year: '2026', status: 'PARTICIPANT',
@@ -38,7 +43,7 @@ export default async function CompetitionPage({ params }: { params: Promise<{ sl
   const notionPosts = slug === 'club-union-ctf' && competition.writeups ? await Promise.all(competition.writeups.map((writeup) => writeup.notionId ? getNotionPost(writeup.notionId) : null)) : []
 
   return (
-    <main>
+    <main className="page-main">
       <Nav />
       <section className="study-page competition-page">
         <div className="study-page__head"><div className="sec-tag">COMPETITION{competition.year ? ` / ${competition.year}` : ''}</div><div className="study-page__path">ACTIVITY://{slug.toUpperCase()}</div></div>
@@ -56,7 +61,7 @@ export default async function CompetitionPage({ params }: { params: Promise<{ sl
           {competition.writeups.map((writeup, index) => <details key={writeup.title} className="competition-writeup">
             <summary><i>{String(index + 1).padStart(2, '0')}</i><strong>{writeup.title}</strong><span>{writeup.category}</span><b>＋</b></summary>
             <div className="competition-writeup__body">
-              {notionPosts[index] ? <div className="notion-post__content" dangerouslySetInnerHTML={{ __html: notionPosts[index]!.contentHtml }} /> : <a href={writeup.href} target="_blank" rel="noopener noreferrer">원문 열기 ↗</a>}
+              {notionPosts[index] ? <div className="notion-post__content" dangerouslySetInnerHTML={{ __html: notionPosts[index]!.contentHtml }} /> : writeup.href ? <a href={writeup.href} target="_blank" rel="noopener noreferrer">원문 열기 ↗</a> : <><div className="competition-writeup__placeholder">// 문제 출제 자료는 준비 중입니다.</div>{slug === 'ku-ctf' && <CompetitionMaterials problem={writeup.title.toLowerCase() as 'directory' | 'xss'} />}</>}
             </div>
           </details>)}
         </div>}
