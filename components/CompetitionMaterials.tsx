@@ -36,11 +36,18 @@ export default function CompetitionMaterials({ problem }: { problem: 'directory'
     setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.`)
     load()
   }
+  const remove = async (name: string) => {
+    if (!window.confirm(`'${name}' 파일을 삭제할까요?`)) return
+    const res = await fetch(`/api/activities/competitions/ku-ctf/${problem}/${encodeURIComponent(name)}`, { method: 'DELETE' })
+    const data = await res.json().catch(() => ({}))
+    setMessage(res.ok ? `${name} 파일을 삭제했어요.` : (data.error ?? '삭제에 실패했어요.'))
+    if (res.ok) load()
+  }
   const canDownload = isAdmin || isMember
   return <div className="competition-materials">
     <div className="competition-materials__head"><span>PROBLEM MATERIALS</span><small>ZIP / FILES</small></div>
     {isAdmin && <form onSubmit={upload} className="competition-materials__upload"><input name="file" type="file" multiple aria-label={`${problem} 문제 자료 업로드`} /><button className="btn-secondary" disabled={uploading}>{uploading ? 'UPLOADING...' : 'UPLOAD FILES'}</button></form>}
     {message && <div className="competition-materials__message">{message}</div>}
-    {!ready || files.length === 0 ? <div className="competition-materials__empty">// 등록된 문제 자료 없음</div> : <div className="competition-materials__list">{files.map((file) => canDownload ? <a key={file.name} href={`/api/activities/competitions/ku-ctf/${problem}/${encodeURIComponent(file.name)}`} className="competition-material">↘ {file.name}<small>{formatSize(file.size)}</small></a> : <div key={file.name} className="competition-material competition-material--locked">⌁ {file.name}<small>LOGIN REQUIRED</small></div>)}</div>}
+    {!ready || files.length === 0 ? <div className="competition-materials__empty">// 등록된 문제 자료 없음</div> : <div className="competition-materials__list">{files.map((file) => canDownload ? <div key={file.name} className="competition-material-row"><a href={`/api/activities/competitions/ku-ctf/${problem}/${encodeURIComponent(file.name)}`} className="competition-material">↘ {file.name}<small>{formatSize(file.size)}</small></a>{isAdmin && <button className="file-delete" onClick={() => remove(file.name)} aria-label={`${file.name} 삭제`}>×</button>}</div> : <div key={file.name} className="competition-material competition-material--locked">⌁ {file.name}<small>LOGIN REQUIRED</small></div>)}</div>}
   </div>
 }

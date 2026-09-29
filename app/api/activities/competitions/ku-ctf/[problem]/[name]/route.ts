@@ -1,8 +1,8 @@
-import { readFile } from 'fs/promises'
+import { readFile, unlink } from 'fs/promises'
 import path from 'path'
 import { NextResponse, type NextRequest } from 'next/server'
 import { readToken, SESSION_COOKIE } from '@/lib/session'
-import { blobStorageEnabled, getPrivateFile } from '@/lib/blob-storage'
+import { blobStorageEnabled, deletePrivateFile, getPrivateFile } from '@/lib/blob-storage'
 import { safeFileName } from '@/lib/file-name'
 
 export const runtime = 'nodejs'
@@ -23,6 +23,21 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pro
   try {
     const data = await readFile(path.join(baseDir, problem, safe))
     return new NextResponse(data, { headers: { 'Content-Type': 'application/octet-stream', 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(safe)}`, 'Cache-Control': 'private, no-store' } })
+  } catch {
+    return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
+  }
+}
+
+export async function DELETE(request: NextRequest, context: { params: Promise<{ problem: string; name: string }> }) {
+  if (!process.env.ADMIN_SESSION_SECRET || readToken(request.cookies.get(SESSION_COOKIE)?.value) !== process.env.ADMIN_ID) return NextResponse.json({ error: '관리자만 파일을 삭제할 수 있습니다.' }, { status: 403 })
+  const { problem, name } = await context.params
+  if (problem !== 'directory' && problem !== 'xss') return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
+  const safe = safeFileName(decodeURIComponent(name))
+  if (!safe) return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
+  try {
+    if (blobStorageEnabled()) await deletePrivateFile(`ku-ctf/${problem}/${safe}`)
+    else await unlink(path.join(baseDir, problem, safe))
+    return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
   }

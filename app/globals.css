@@ -218,6 +218,10 @@ section:not(#about) { max-width: 1280px; margin: 0 auto; }
 .session-file small { margin-left: auto; flex-shrink: 0; color: var(--tx2); font-size: 9px; }
 .session-file--locked { opacity: .62; cursor: not-allowed; }
 .session-file--locked:hover { border-color: var(--bd); color: var(--tx); }
+.session-file-row, .private-file-row, .competition-material-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.session-file-row .session-file, .private-file-row .private-file, .competition-material-row .competition-material { flex: 1; min-width: 0; }
+.file-delete { flex: 0 0 auto; width: 25px; height: 25px; border: 1px solid var(--bd); border-radius: 6px; background: transparent; color: var(--acc4); cursor: pointer; font-size: 17px; line-height: 1; }
+.file-delete:hover { border-color: var(--acc4); background: rgba(255,143,158,.1); }
 .study-files { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--bd); }
 .study-files__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .study-files__head p { margin-top: .7rem; color: var(--tx2); font: 13px/1.6 var(--font-sans); }

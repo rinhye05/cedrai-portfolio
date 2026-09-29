@@ -45,6 +45,14 @@ export default function RookiePage() {
     setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.${skipped}`); loadFiles()
   }
 
+  const remove = async (name: string) => {
+    if (!window.confirm(`'${name}' 파일을 삭제할까요?`)) return
+    const res = await fetch(`/api/club/sekurity/rookie/${encodeURIComponent(name)}`, { method: 'DELETE' })
+    const data = await res.json().catch(() => ({}))
+    setMessage(res.ok ? `${name} 파일을 삭제했어요.` : (data.error ?? '삭제에 실패했어요.'))
+    if (res.ok) loadFiles()
+  }
+
   return (
     <main className="page-main">
       <Nav />
@@ -70,11 +78,11 @@ export default function RookiePage() {
             <div className="private-files__list">
               {files.length === 0 ? <div className="private-files__empty">// 아직 업로드된 파일이 없습니다.</div> : files.map((file) => (
                 canAccess ? (
-                  <a key={file.name} className="private-file" href={`/api/club/sekurity/rookie/${encodeURIComponent(file.name)}`}>
+                  <div key={file.name} className="private-file-row"><a className="private-file" href={`/api/club/sekurity/rookie/${encodeURIComponent(file.name)}`}>
                     <span className="private-file__icon">↘</span>
                     <span className="private-file__name">{file.name}</span>
                     <span className="private-file__meta">{formatSize(file.size)} · {new Date(file.uploadedAt).toLocaleDateString('ko-KR')}</span>
-                  </a>
+                  </a>{isAdmin && <button className="file-delete" onClick={() => remove(file.name)} aria-label={`${file.name} 삭제`}>×</button>}</div>
                 ) : (
                   <div key={file.name} className="private-file private-file--locked">
                     <span className="private-file__icon">⌁</span>

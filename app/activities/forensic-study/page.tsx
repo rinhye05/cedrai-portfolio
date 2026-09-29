@@ -62,6 +62,14 @@ export default function ForensicStudyPage() {
     setMessage(`${data.uploaded?.length ?? 0}개 파일을 업로드했어요.${skipped}`); loadFiles(sessionId)
   }
 
+  const remove = async (sessionId: string, kind: 'reports' | 'practice', name: string) => {
+    if (!window.confirm(`'${name}' 파일을 삭제할까요?`)) return
+    const res = await fetch(`/api/activities/forensic-study/${sessionId}/${encodeURIComponent(name)}?kind=${kind}`, { method: 'DELETE' })
+    const data = await res.json().catch(() => ({}))
+    setMessage(res.ok ? `${name} 파일을 삭제했어요.` : (data.error ?? '삭제에 실패했어요.'))
+    if (res.ok) loadFiles(sessionId)
+  }
+
   const toggleSession = (index: number) => {
     const next = open === index ? -1 : index
     setOpen(next)
@@ -73,7 +81,7 @@ export default function ForensicStudyPage() {
     return <div className="session-files__section">
       <div className="session-files__title">{label}</div>
       {isAdmin && <form onSubmit={(event) => upload(event, sessionId, kind)} className="session-files__upload"><input name="file" type="file" multiple accept=".zip,.7z,.rar,.pdf,.doc,.docx,.txt,.md,.raw,.pcap,.e01,.dd,.img" aria-label={`${label} 업로드`} /><button className="btn-secondary" disabled={uploading}>{uploading ? '...' : 'UPLOAD FILES'}</button></form>}
-      <div className="session-files__list">{list.length === 0 ? <span className="session-files__empty">// 준비된 파일 없음</span> : list.map((file) => canDownload ? <a key={file.name} href={`/api/activities/forensic-study/${sessionId}/${encodeURIComponent(file.name)}?kind=${kind}`} className="session-file">↘ {file.name}<small>{formatSize(file.size)}</small></a> : <span key={file.name} className="session-file session-file--locked">⌁ {file.name}<small>LOGIN REQUIRED</small></span>)}</div>
+      <div className="session-files__list">{list.length === 0 ? <span className="session-files__empty">// 준비된 파일 없음</span> : list.map((file) => canDownload ? <div key={file.name} className="session-file-row"><a href={`/api/activities/forensic-study/${sessionId}/${encodeURIComponent(file.name)}?kind=${kind}`} className="session-file">↘ {file.name}<small>{formatSize(file.size)}</small></a>{isAdmin && <button className="file-delete" onClick={() => remove(sessionId, kind, file.name)} aria-label={`${file.name} 삭제`}>×</button>}</div> : <span key={file.name} className="session-file session-file--locked">⌁ {file.name}<small>LOGIN REQUIRED</small></span>)}</div>
     </div>
   }
 

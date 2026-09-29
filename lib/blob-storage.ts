@@ -1,4 +1,4 @@
-import { get, list, put } from '@vercel/blob'
+import { del, get, list, put } from '@vercel/blob'
 
 export const blobStorageEnabled = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID)
 
@@ -17,4 +17,8 @@ export async function uploadPrivateFile(pathname: string, file: File) {
 
 export async function getPrivateFile(pathname: string) {
   return get(pathname, { access: 'private' })
+}
+
+export async function deletePrivateFile(pathname: string) {
+  return del(pathname)
 }
