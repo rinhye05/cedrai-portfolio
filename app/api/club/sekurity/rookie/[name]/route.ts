@@ -2,6 +2,7 @@ import { readFile } from 'fs/promises'
 import path from 'path'
 import { NextResponse, type NextRequest } from 'next/server'
 import { readToken, SESSION_COOKIE } from '@/lib/session'
+import { blobStorageEnabled, getPrivateFile } from '@/lib/blob-storage'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -15,6 +16,11 @@ export async function GET(request: NextRequest, context: { params: Promise<{ nam
   const { name } = await context.params
   const safeName = decodeURIComponent(name).replace(/[^a-zA-Z0-9가-힣._ -]/g, '_').replace(/\.\./g, '_').trim()
   if (!safeName) return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
+  if (blobStorageEnabled()) {
+    const result = await getPrivateFile(`sekurity-rookie/${safeName}`)
+    if (!result || result.statusCode !== 200) return NextResponse.json({ error: '파일을 찾을 수 없습니다.' }, { status: 404 })
+    return new NextResponse(result.stream, { headers: { 'Content-Type': result.blob.contentType || 'application/octet-stream', 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(safeName)}`, 'Cache-Control': 'private, no-store' } })
+  }
   try {
     const data = await readFile(path.join(uploadDir, safeName))
     return new NextResponse(data, {
