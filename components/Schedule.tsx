@@ -199,6 +199,13 @@ export default function Schedule() {
     await commit({ ...scheduleData, todos: scheduleData.todos.filter(t => t.id !== id) })
   }
 
+  const toggleTodo = async (id: string) => {
+    await commit({
+      ...scheduleData,
+      todos: scheduleData.todos.map(t => t.id === id ? { ...t, done: !t.done } : t),
+    })
+  }
+
   const startEditTodo = (todo: typeof scheduleData.todos[number]) => {
     setTodoEditId(todo.id)
     setTodoForm({ startDate: todo.date, endDate: todo.date, content: todo.content, done: todo.done })
@@ -378,9 +385,15 @@ export default function Schedule() {
             {selectedTodos.map(t => (
               <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                  <div style={{ width: '18px', height: '18px', border: `1px solid ${t.done ? 'var(--acc2)' : 'var(--bd)'}`, background: t.done ? 'var(--acc2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <button
+                    type="button"
+                    onClick={() => toggleTodo(t.id)}
+                    disabled={!isAdmin || saving}
+                    aria-label={`${t.content} ${t.done ? '미완료로 표시' : '완료로 표시'}`}
+                    style={{ width: '18px', height: '18px', border: `1px solid ${t.done ? 'var(--acc2)' : 'var(--bd)'}`, background: t.done ? 'var(--acc2)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: 0, cursor: isAdmin && !saving ? 'pointer' : 'default' }}
+                  >
                     {t.done && <span style={{ fontSize: '11px', color: 'var(--bg)', fontWeight: 700 }}>✓</span>}
-                  </div>
+                  </button>
                   <span style={{ fontSize: '14px', color: t.done ? 'var(--tx2)' : 'var(--tx)', textDecoration: t.done ? 'line-through' : 'none', flex: 1, fontFamily: 'sans-serif' }}>{t.content}</span>
                 </div>
                 {isAdmin && (
