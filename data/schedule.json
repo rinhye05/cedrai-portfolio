@@ -153,6 +153,41 @@
       "date": "2026-10-14",
       "description": "",
       "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709399909-0",
+      "title": "중간고사",
+      "date": "2026-10-19",
+      "description": "",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709399909-1",
+      "title": "중간고사",
+      "date": "2026-10-20",
+      "description": "",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709399909-2",
+      "title": "중간고사",
+      "date": "2026-10-21",
+      "description": "",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709399909-3",
+      "title": "중간고사",
+      "date": "2026-10-22",
+      "description": "",
+      "color": "#b7aefe"
+    },
+    {
+      "id": "event-1790709399909-4",
+      "title": "중간고사",
+      "date": "2026-10-23",
+      "description": "",
+      "color": "#b7aefe"
     }
   ],
   "todos": [
